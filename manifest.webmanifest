@@ -1,0 +1,16 @@
+{
+  "name": "Critter Duel",
+  "short_name": "Critter Duel",
+  "description": "Collect creature cards, duel AI trainers and fill your album.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#1b1250",
+  "theme_color": "#1b1250",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
