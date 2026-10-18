@@ -513,6 +513,32 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
 .land .tc{width:min(15vw,96px)}
 .land .tc0{left:2%;bottom:8%}.land .tc1{right:2%;bottom:8%}.land .tc2{right:3%;top:6%;width:min(13vw,80px)}.land .tc3{left:3%;top:6%;width:min(13vw,80px)}
 
+/* ---------- attack cinematics (src/fx.js) ---------- */
+.fxs{position:absolute;inset:0;z-index:40;overflow:hidden;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+.fxs-dim{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,#1a0f4a 0%,#080420 100%);opacity:0}
+.fxs-in{position:absolute;inset:0;will-change:transform}
+.fxs-bg,.fxs-fg{position:absolute;left:0;top:0;pointer-events:none}
+.fxs-card{position:absolute;transform-origin:50% 50%;will-change:transform,opacity;opacity:0}
+.fxs-cardbox{position:absolute;inset:0;filter:drop-shadow(0 8px 12px rgba(0,0,0,.55))}
+.fxs-cardbox .card{position:absolute;left:0;top:0}
+.fxs-portal{position:absolute;left:6.9%;top:15.3%;width:86.2%;height:41%;border-radius:.9em;mix-blend-mode:screen;opacity:0;pointer-events:none;box-shadow:inset 0 0 18px 6px rgba(255,255,255,.65)}
+.fxs-crit{position:absolute;pointer-events:none;transform-origin:50% 80%;opacity:0;will-change:transform,filter}
+.fxs-hp{position:absolute;left:-4%;right:-4%;top:100%;margin-top:6px;display:flex;flex-direction:column;align-items:center;gap:2px;opacity:0;font-size:12px;font-weight:900;color:#fff;text-shadow:0 2px 0 var(--ink),1px 0 0 var(--ink),-1px 0 0 var(--ink)}
+.fxs-hp b{font-weight:900;font-size:12px;letter-spacing:.2px;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fxs-hp .bar{display:block;width:86%;height:9px;background:rgba(10,5,30,.8);border:2px solid var(--ink);border-radius:6px;overflow:hidden}
+.fxs-hp .bar i{display:block;height:100%;width:100%;background:var(--mint);transition:none}
+.fxs-hp .bar i.mid{background:#ffd23d}.fxs-hp .bar i.lo{background:var(--red)}
+.fxs-hp em{font-style:normal;font-size:11px}
+.fxs-name{position:absolute;left:0;right:0;top:41%;display:flex;justify-content:center;pointer-events:none;opacity:0}
+.fxs-name span{display:inline-block;font-size:clamp(24px,8vw,40px);font-weight:900;font-style:italic;letter-spacing:.5px;color:var(--nc,#fff);-webkit-text-stroke:2px var(--ink);paint-order:stroke fill;text-shadow:0 4px 0 var(--ink),0 0 18px var(--nc2,#fff);white-space:nowrap;max-width:94%;overflow:hidden;text-overflow:ellipsis;padding:0 .1em}
+.fxs-flash,.fxs-tint{position:absolute;inset:0;opacity:0;pointer-events:none}
+.fxs-num{position:absolute;transform:translate(-50%,-50%);font-size:38px;font-weight:900;color:#fff;text-shadow:0 3px 0 var(--ink),2px 0 0 var(--ink),-2px 0 0 var(--ink),0 -2px 0 var(--ink),2px 2px 0 var(--ink),-2px -2px 0 var(--ink),2px -2px 0 var(--ink),-2px 2px 0 var(--ink);animation:fnum 1.3s ease-out forwards;white-space:nowrap;pointer-events:none}
+.fxs-num.big{font-size:52px;color:#ffe066}.fxs-num.weak{color:#ff8a5c;font-size:46px}.fxs-num.heal{color:var(--mint)}.fxs-num.dot{color:#d9a0ff;font-size:28px}
+.fxs-num.tag{font-size:19px;color:var(--sun)}
+.fxs-word{position:absolute;transform:translate(-50%,-50%) rotate(var(--rot,0deg));font-size:clamp(28px,9vw,46px);font-weight:900;font-style:italic;-webkit-text-stroke:3px var(--ink);paint-order:stroke fill;text-shadow:0 5px 0 var(--ink),0 0 14px var(--wc,#fff);animation:fxword 1s ease-out forwards;white-space:nowrap;pointer-events:none}
+@keyframes fxword{0%{transform:translate(-50%,-50%) rotate(var(--rot,0deg)) scale(.2);opacity:0}16%{transform:translate(-50%,-50%) rotate(var(--rot,0deg)) scale(1.35);opacity:1}30%{transform:translate(-50%,-50%) rotate(var(--rot,0deg)) scale(1)}78%{opacity:1}100%{transform:translate(-50%,-70%) rotate(var(--rot,0deg)) scale(1.05);opacity:0}}
+@media (prefers-reduced-motion:reduce){.fxs-word,.fxs-num{animation-duration:.6s}}
+
 </style>
 </head>
 <body>
@@ -532,7 +558,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
 <noscript><p style="color:#fff;font:16px sans-serif;padding:24px">Critter Duel needs JavaScript to run.</p></noscript>
 <script>
 /* ===== version ===== */
-(globalThis.CD = globalThis.CD || {}).VERSION = '1.3.0'; globalThis.CD.BUILD = 'b49777e';
+(globalThis.CD = globalThis.CD || {}).VERSION = '1.4.0'; globalThis.CD.BUILD = '8c0de15';
 /* ===== data.js ===== */
 /* Critter Duel — card data, trainers, utilities. Original creatures & names. */
 (function (root) {
@@ -3036,7 +3062,24 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
     attackWhoosh(c, b, t) { noise(c, b, t, 0.2, { type: 'bandpass', freq: 500, freqTo: 4000, q: 1.2, vol: 0.2 }); },
     flip(c, b, t) { for (let i = 0; i < 5; i++) tone(c, b, 1800 + i * 90, t + i * 0.05, 0.03, { wave: 'pulse50', vol: 0.05, s: 0 }); },
     reveal(c, b, t) { [79, 83, 86, 91, 95].forEach((n, i) => tone(c, b, freqOf(n), t + i * 0.05, 0.3, { wave: 'pulse25', vol: 0.1, s: 0.4, r: 0.2 })); noise(c, b, t, 0.3, { type: 'highpass', freq: 6000, vol: 0.06 }); },
-    promote(c, b, t) { tone(c, b, freqOf(60), t, 0.1, { wave: 'tri', vol: 0.2 }); tone(c, b, freqOf(67), t + 0.09, 0.14, { wave: 'tri', vol: 0.2 }); }
+    promote(c, b, t) { tone(c, b, freqOf(60), t, 0.1, { wave: 'tri', vol: 0.2 }); tone(c, b, freqOf(67), t + 0.09, 0.14, { wave: 'tri', vol: 0.2 }); },
+    /* attack cinematics */
+    emerge(c, b, t) { noise(c, b, t, 0.3, { type: 'bandpass', freq: 400, freqTo: 3200, q: 1.5, vol: 0.12 }); [67, 72, 76, 83].forEach((n, i) => tone(c, b, freqOf(n), t + 0.12 + i * 0.05, 0.16, { wave: 'pulse25', vol: 0.07, s: 0.3, r: 0.1 })); },
+    whoosh(c, b, t) { noise(c, b, t, 0.3, { type: 'bandpass', freq: 400, freqTo: 3500, q: 1, vol: 0.2 }); },
+    wind(c, b, t) { noise(c, b, t, 0.7, { type: 'bandpass', freq: 800, freqTo: 2600, q: 2, vol: 0.2 }); noise(c, b, t + 0.1, 0.5, { type: 'highpass', freq: 3500, vol: 0.06 }); },
+    zap(c, b, t) { noise(c, b, t, 0.08, { type: 'highpass', freq: 5000, vol: 0.22 }); tone(c, b, 1800, t, 0.22, { wave: 'saw', slideTo: 90, vol: 0.14, s: 0 }); tone(c, b, 2400, t + 0.05, 0.18, { wave: 'pulse25', slideTo: 300, vol: 0.09, s: 0 }); },
+    charge(c, b, t) { tone(c, b, 220, t, 0.6, { wave: 'saw', slideTo: 1500, vol: 0.09, s: 0.8, a: 0.05 }); noise(c, b, t + 0.4, 0.3, { type: 'highpass', freq: 5000, vol: 0.1 }); },
+    fire(c, b, t) { noise(c, b, t, 0.55, { type: 'lowpass', freq: 3000, freqTo: 500, vol: 0.28 }); noise(c, b, t, 0.4, { type: 'bandpass', freq: 1200, q: 0.8, vol: 0.12 }); tone(c, b, 140, t, 0.3, { wave: 'saw', slideTo: 70, vol: 0.08 }); },
+    splash(c, b, t) { noise(c, b, t, 0.35, { type: 'bandpass', freq: 1500, freqTo: 600, q: 0.7, vol: 0.24 }); [90, 95, 99].forEach((n, i) => tone(c, b, freqOf(n), t + i * 0.04, 0.08, { wave: 'sine', slideTo: freqOf(n - 8), vol: 0.07, s: 0 })); },
+    frost(c, b, t) { [96, 100, 103, 108].forEach((n, i) => tone(c, b, freqOf(n), t + i * 0.04, 0.2, { wave: 'sine', vol: 0.09, s: 0.2, r: 0.12 })); noise(c, b, t + 0.1, 0.25, { type: 'highpass', freq: 7000, vol: 0.12 }); },
+    rumble(c, b, t) { noise(c, b, t, 0.7, { type: 'lowpass', freq: 400, freqTo: 80, vol: 0.4 }); tone(c, b, 80, t, 0.6, { wave: 'sine', slideTo: 38, vol: 0.4, s: 0.3 }); noise(c, b, t + 0.12, 0.3, { type: 'bandpass', freq: 700, vol: 0.14 }); },
+    leaf(c, b, t) { noise(c, b, t, 0.28, { type: 'bandpass', freq: 3200, freqTo: 6000, q: 1.5, vol: 0.18 }); [79, 83, 86].forEach((n, i) => tone(c, b, freqOf(n), t + i * 0.05, 0.12, { wave: 'tri', vol: 0.1, s: 0.3 })); },
+    shade(c, b, t) { tone(c, b, 200, t, 0.7, { wave: 'saw', slideTo: 90, vol: 0.09, s: 0.7 }); tone(c, b, 207, t, 0.7, { wave: 'saw', slideTo: 95, vol: 0.07, s: 0.7 }); noise(c, b, t, 0.5, { type: 'bandpass', freq: 300, freqTo: 1200, q: 3, vol: 0.12 }); },
+    cosmic(c, b, t) { [72, 79, 84, 88, 91, 96].forEach((n, i) => tone(c, b, freqOf(n), t + i * 0.08, 0.4, { wave: 'sine', vol: 0.1, a: 0.01, s: 0.5, r: 0.25 })); noise(c, b, t, 0.7, { type: 'highpass', freq: 5000, freqTo: 9000, vol: 0.07 }); },
+    slash(c, b, t) { noise(c, b, t, 0.14, { type: 'highpass', freq: 3500, freqTo: 8000, vol: 0.3 }); tone(c, b, 1400, t, 0.12, { wave: 'saw', slideTo: 400, vol: 0.06, s: 0 }); },
+    chomp(c, b, t) { noise(c, b, t, 0.05, { type: 'bandpass', freq: 1800, q: 2, vol: 0.3 }); noise(c, b, t + 0.1, 0.07, { type: 'bandpass', freq: 1200, q: 2, vol: 0.36 }); tone(c, b, 200, t + 0.1, 0.1, { wave: 'sine', slideTo: 70, vol: 0.3, s: 0 }); },
+    beam(c, b, t) { tone(c, b, 300, t, 0.8, { wave: 'saw', slideTo: 600, vol: 0.09, s: 0.8, a: 0.04 }); tone(c, b, 604, t, 0.8, { wave: 'pulse25', slideTo: 1200, vol: 0.05, s: 0.8, a: 0.04 }); noise(c, b, t, 0.7, { type: 'bandpass', freq: 2000, q: 1, vol: 0.12 }); },
+    poof(c, b, t) { noise(c, b, t, 0.25, { type: 'lowpass', freq: 1800, freqTo: 400, vol: 0.24 }); tone(c, b, 400, t, 0.12, { wave: 'sine', slideTo: 150, vol: 0.1, s: 0 }); }
   };
   function sfx(name) {
     if (!ctx || !S.sfxOn || !S.unlocked || !SFX[name]) return;
@@ -3135,7 +3178,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
   const defaults = () => ({
     v: 1, started: false, starter: null, owned: {}, deck: [], beaten: {}, seen: {}, seenHelp: false, tutorialDone: false,
     stats: { wins: 0, losses: 0 },
-    settings: { music: true, sfx: true, musicVol: 0.7, sfxVol: 0.8, trainers: 8, skill: 0, speed: 1 }
+    settings: { music: true, sfx: true, musicVol: 0.7, sfxVol: 0.8, trainers: 8, skill: 0, speed: 1, fx: 2 }
   });
   let save = defaults();
   function load() {
@@ -3540,6 +3583,7 @@ ${line.length > 1 ? `<div class="evo">${line.map((x) => `<button class="${x.id =
 <label class="row"><span>Effects volume</span><input type="range" min="0" max="100" value="${Math.round(st.sfxVol * 100)}" data-rng="sfxVol"></label>
 <div class="row col"><span>Trainers on the circuit <b id="set-trn">${st.trainers}</b></span><input type="range" min="3" max="16" value="${st.trainers}" data-rng="trainers"><small>Fewer trainers means bigger prize pools per trainer. All ${NC} cards stay obtainable at any setting.</small></div>
 <div class="row col"><span>Trainer skill</span><div class="seg" id="seg-skill">${SKILL.map((n, i) => `<button class="${st.skill === i - 2 ? 'on' : ''}" data-act="skill" data-v="${i - 2}">${n}</button>`).join('')}</div></div>
+<div class="row col"><span>Attack animations</span><div class="seg" id="seg-fx">${['Off', 'Quick', 'Full'].map((n, i) => `<button class="${st.fx === i ? 'on' : ''}" data-act="fxmode" data-v="${i}">${n}</button>`).join('')}</div></div>
 <div class="row col"><span>Battle speed</span><div class="seg"><button class="${st.speed === 1 ? 'on' : ''}" data-act="speed" data-v="1">Normal</button><button class="${st.speed === 2 ? 'on' : ''}" data-act="speed" data-v="2">Fast</button></div></div>
 <div class="row ver"><span>Version <b>${CD.VERSION || '?'}</b>${CD.BUILD ? ' <small>build ' + CD.BUILD + '</small>' : ''}<small class="upd-detail" data-upd="detail">${CD.Update ? CD.Update.detail() : ''}</small></span><button class="btn ghost sm" data-act="checkupd">Check for updates</button></div>
 <div class="m-btns wrap"><button class="btn ghost" data-act="tutorial">Tutorial</button><button class="btn ghost" data-act="help">How to play</button><button class="btn ghost warn" data-act="resetsave">Reset save</button><button class="btn" data-act="mclose">Done</button></div>
@@ -3613,6 +3657,7 @@ ${line.length > 1 ? `<div class="evo">${line.map((x) => `<button class="${x.id =
       persist(); AU.sfx('click');
     },
     skill(el) { save.settings.skill = parseInt(el.dataset.v, 10); rosterCache = null; $$('#seg-skill button').forEach((b) => b.classList.toggle('on', b === el)); persist(); AU.sfx('click'); },
+    fxmode(el) { save.settings.fx = parseInt(el.dataset.v, 10); $$('.seg button[data-act=fxmode]').forEach((b) => b.classList.toggle('on', b === el)); persist(); AU.sfx('click'); },
     speed(el) { save.settings.speed = parseInt(el.dataset.v, 10); $$('.seg button[data-act=speed]').forEach((b) => b.classList.toggle('on', b === el)); persist(); AU.sfx('click'); },
     help() { helpModal(); },
     tutorial() { AU.sfx('ok'); closeAllModals(); if (UI.startTutorial) UI.startTutorial(); },
@@ -3696,6 +3741,787 @@ ${line.length > 1 ? `<div class="evo">${line.map((x) => `<button class="${x.id =
   }
   CD.init = init;
   if (typeof module !== 'undefined') module.exports = UI;
+})(globalThis);
+
+/* ===== fx.js ===== */
+/* Critter Duel — attack cinematics.
+   When a critter attacks, both active cards lift off the board, each critter bursts out of its card,
+   the attack plays out with its own visual effect, then everyone drops back into their cards.
+   Everything is drawn in code: a small canvas particle engine plus a handful of DOM layers.
+   Part 1: engine and stage.  Part 2: effect primitives.  Part 3: one recipe per attack. */
+(function (root) {
+  'use strict';
+  const CD = (root.CD = root.CD || {});
+  const doc = root.document;
+  const TAU = Math.PI * 2;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  const pick = (a) => a[Math.floor(Math.random() * a.length)];
+  const EZ = {
+    lin: (t) => t, out: (t) => 1 - (1 - t) * (1 - t), out3: (t) => 1 - Math.pow(1 - t, 3), in: (t) => t * t, in3: (t) => t * t * t,
+    io: (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2),
+    back: (t) => { const c1 = 1.8, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); },
+    sine: (t) => Math.sin(t * Math.PI)
+  };
+
+  /* ---------- colours ---------- */
+  const COLS = {
+    fire: '#ff8a3a', flame: '#ffb347', gold: '#ffd84a', pale: '#fff3c4', ice: '#bfeaff', frost: '#e8faff', leaf: '#6fe07a', lime: '#b8f060', water: '#58b8ff', deep: '#2a6fd6',
+    shade: '#a47bff', ink: '#2a1a45', stone: '#c9a46a', rock: '#8a6a44', pink: '#ff7ac8', white: '#ffffff', red: '#ff4d4d', mud: '#8a6238', toxic: '#b36bff', spore: '#e8e07a', sky: '#9fd8ff', star: '#ffe9a8'
+  };
+  const hexCache = {};
+  function rgb(c) {
+    if (hexCache[c]) return hexCache[c];
+    let h = c.replace('#', ''); if (h.length === 3) h = h.split('').map((x) => x + x).join('');
+    const n = parseInt(h, 16); return (hexCache[c] = [(n >> 16) & 255, (n >> 8) & 255, n & 255]);
+  }
+  const rgba = (c, a) => { const q = rgb(c); return `rgba(${q[0]},${q[1]},${q[2]},${a})`; };
+  function mix(c1, c2, t) { const a = rgb(c1), b = rgb(c2); return '#' + [0, 1, 2].map((i) => Math.round(lerp(a[i], b[i], t)).toString(16).padStart(2, '0')).join(''); }
+
+  /* ---------- particle shapes (drawn at 0,0 pointing along +x) ---------- */
+  function glow(ctx, r, c, a) {
+    const g = ctx.createRadialGradient(0, 0, 0, 0, 0, r);
+    g.addColorStop(0, rgba(c, a)); g.addColorStop(0.45, rgba(c, a * 0.5)); g.addColorStop(1, rgba(c, 0));
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, r, 0, TAU); ctx.fill();
+  }
+  const SH = {
+    dot(ctx, s, c) { glow(ctx, s, c, 1); },
+    orb(ctx, s, c, c2) { glow(ctx, s * 1.8, c, 0.8); ctx.fillStyle = c; ctx.beginPath(); ctx.arc(0, 0, s * 0.62, 0, TAU); ctx.fill(); ctx.fillStyle = c2 || '#fff'; ctx.beginPath(); ctx.arc(0, 0, s * 0.3, 0, TAU); ctx.fill(); },
+    ember(ctx, s, c, c2) { glow(ctx, s * 2, c, 0.9); ctx.fillStyle = c2 || '#ffe27a'; ctx.beginPath(); ctx.arc(0, 0, s * 0.55, 0, TAU); ctx.fill(); ctx.fillStyle = '#fff8d8'; ctx.beginPath(); ctx.arc(0, 0, s * 0.26, 0, TAU); ctx.fill(); },
+    spark(ctx, s, c) { ctx.lineCap = 'round'; ctx.strokeStyle = c; ctx.lineWidth = Math.max(1.6, s * 0.2); ctx.beginPath(); ctx.moveTo(-s, 0); ctx.lineTo(s, 0); ctx.stroke(); ctx.strokeStyle = '#fff'; ctx.lineWidth = Math.max(1, s * 0.08); ctx.stroke(); },
+    streak(ctx, s, c) { const g = ctx.createLinearGradient(-s * 3, 0, s, 0); g.addColorStop(0, rgba(c, 0)); g.addColorStop(1, rgba(c, 1)); ctx.strokeStyle = g; ctx.lineCap = 'round'; ctx.lineWidth = Math.max(1.5, s * 0.16); ctx.beginPath(); ctx.moveTo(-s * 3, 0); ctx.lineTo(s, 0); ctx.stroke(); },
+    star(ctx, s, c) {
+      ctx.fillStyle = c; ctx.strokeStyle = '#fff'; ctx.lineWidth = Math.max(1, s * 0.1); ctx.beginPath();
+      for (let i = 0; i < 10; i++) { const r = i % 2 ? s * 0.45 : s, a = (i / 10) * TAU - Math.PI / 2; ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r); }
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+    },
+    diamond(ctx, s, c, c2) { const g = ctx.createLinearGradient(-s, 0, s * 1.3, 0); g.addColorStop(0, c2 || c); g.addColorStop(1, c); ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(s * 1.3, 0); ctx.lineTo(0, s * 0.38); ctx.lineTo(-s * 0.9, 0); ctx.lineTo(0, -s * 0.38); ctx.closePath(); ctx.fill(); ctx.strokeStyle = 'rgba(255,255,255,.85)'; ctx.lineWidth = Math.max(1, s * 0.08); ctx.stroke(); },
+    rock(ctx, s, c, c2, p) {
+      const sd = p.seed || 1; ctx.beginPath();
+      for (let i = 0; i < 7; i++) { const a = (i / 7) * TAU, r = s * (0.72 + 0.38 * Math.abs(Math.sin(sd * 12.9 + i * 7.3))); ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r); }
+      ctx.closePath(); const g = ctx.createLinearGradient(-s, -s, s, s); g.addColorStop(0, c); g.addColorStop(1, c2 || '#5a4028'); ctx.fillStyle = g; ctx.fill();
+      ctx.lineWidth = Math.max(1.5, s * 0.12); ctx.strokeStyle = '#2a1a10'; ctx.stroke();
+      ctx.fillStyle = 'rgba(255,255,255,.25)'; ctx.beginPath(); ctx.arc(-s * 0.25, -s * 0.3, s * 0.28, 0, TAU); ctx.fill();
+    },
+    leaf(ctx, s, c, c2) {
+      ctx.fillStyle = c; ctx.beginPath(); ctx.moveTo(-s, 0); ctx.quadraticCurveTo(0, -s * 0.8, s, 0); ctx.quadraticCurveTo(0, s * 0.8, -s, 0); ctx.fill();
+      ctx.strokeStyle = c2 || '#2b8a46'; ctx.lineWidth = Math.max(1, s * 0.1); ctx.stroke(); ctx.beginPath(); ctx.moveTo(-s * 0.9, 0); ctx.lineTo(s * 0.8, 0); ctx.stroke();
+    },
+    drop(ctx, s, c) {
+      ctx.fillStyle = c; ctx.beginPath(); ctx.moveTo(s * 1.4, 0); ctx.quadraticCurveTo(s * 0.1, -s * 0.8, -s * 0.5, 0); ctx.quadraticCurveTo(s * 0.1, s * 0.8, s * 1.4, 0); ctx.fill();
+      ctx.beginPath(); ctx.arc(-s * 0.1, 0, s * 0.62, 0, TAU); ctx.fill(); ctx.fillStyle = 'rgba(255,255,255,.7)'; ctx.beginPath(); ctx.arc(-s * 0.2, -s * 0.22, s * 0.2, 0, TAU); ctx.fill();
+    },
+    bubble(ctx, s, c) {
+      ctx.fillStyle = rgba(c, 0.2); ctx.beginPath(); ctx.arc(0, 0, s, 0, TAU); ctx.fill(); ctx.strokeStyle = 'rgba(255,255,255,.9)'; ctx.lineWidth = Math.max(1.5, s * 0.1); ctx.stroke();
+      ctx.strokeStyle = 'rgba(255,255,255,.95)'; ctx.lineWidth = Math.max(1.5, s * 0.14); ctx.beginPath(); ctx.arc(0, 0, s * 0.68, Math.PI * 1.1, Math.PI * 1.5); ctx.stroke();
+    },
+    snow(ctx, s, c) {
+      ctx.strokeStyle = c; ctx.lineWidth = Math.max(1.4, s * 0.12); ctx.lineCap = 'round';
+      for (let i = 0; i < 3; i++) { ctx.rotate(Math.PI / 3); ctx.beginPath(); ctx.moveTo(-s, 0); ctx.lineTo(s, 0); ctx.moveTo(s * 0.5, 0); ctx.lineTo(s * 0.72, s * 0.3); ctx.moveTo(s * 0.5, 0); ctx.lineTo(s * 0.72, -s * 0.3); ctx.moveTo(-s * 0.5, 0); ctx.lineTo(-s * 0.72, s * 0.3); ctx.moveTo(-s * 0.5, 0); ctx.lineTo(-s * 0.72, -s * 0.3); ctx.stroke(); }
+    },
+    smoke(ctx, s, c) { glow(ctx, s, c, 0.55); },
+    ring(ctx, s, c, c2, p) { ctx.strokeStyle = c; ctx.lineWidth = p.lw || 3; ctx.beginPath(); ctx.arc(0, 0, s, 0, TAU); ctx.stroke(); },
+    cross(ctx, s, c) { ctx.fillStyle = c; ctx.strokeStyle = '#fff'; ctx.lineWidth = Math.max(1.2, s * 0.12); const w = s * 0.34; ctx.beginPath(); ctx.rect(-w, -s, w * 2, s * 2); ctx.rect(-s, -w, s * 2, w * 2); ctx.fill(); ctx.stroke(); },
+    petal(ctx, s, c) { ctx.fillStyle = c; ctx.beginPath(); ctx.moveTo(-s, 0); ctx.quadraticCurveTo(-s * 0.2, -s * 0.8, s, 0); ctx.quadraticCurveTo(-s * 0.2, s * 0.8, -s, 0); ctx.fill(); },
+    spike(ctx, s, c, c2) { const g = ctx.createLinearGradient(-s * 0.6, 0, s * 1.4, 0); g.addColorStop(0, c2 || c); g.addColorStop(1, c); ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(s * 1.4, 0); ctx.lineTo(-s * 0.6, s * 0.5); ctx.lineTo(-s * 0.6, -s * 0.5); ctx.closePath(); ctx.fill(); ctx.strokeStyle = 'rgba(255,255,255,.7)'; ctx.lineWidth = Math.max(1, s * 0.08); ctx.stroke(); },
+    zz(ctx, s, c) { ctx.font = `900 ${Math.round(s * 2.2)}px system-ui,sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.lineWidth = Math.max(2, s * 0.3); ctx.strokeStyle = '#1a1030'; ctx.strokeText('Z', 0, 0); ctx.fillStyle = c; ctx.fillText('Z', 0, 0); },
+    bolt(ctx, s, c) { ctx.strokeStyle = c; ctx.lineWidth = Math.max(2, s * 0.22); ctx.lineJoin = 'round'; ctx.beginPath(); ctx.moveTo(-s, 0); ctx.lineTo(-s * 0.3, -s * 0.4); ctx.lineTo(s * 0.1, s * 0.3); ctx.lineTo(s, -s * 0.1); ctx.stroke(); ctx.strokeStyle = '#fff'; ctx.lineWidth = Math.max(1, s * 0.08); ctx.stroke(); },
+    wisp(ctx, s, c) { const g = ctx.createLinearGradient(-s * 2.4, 0, s * 0.6, 0); g.addColorStop(0, rgba(c, 0)); g.addColorStop(1, rgba(c, 0.95)); ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(-s * 2.4, 0); ctx.quadraticCurveTo(-s * 0.6, -s * 0.9, s * 0.7, 0); ctx.quadraticCurveTo(-s * 0.6, s * 0.9, -s * 2.4, 0); ctx.fill(); glow(ctx, s, '#fff', 0.7); },
+    seed(ctx, s, c) { ctx.fillStyle = c; ctx.beginPath(); ctx.ellipse(0, 0, s, s * 0.6, 0, 0, TAU); ctx.fill(); ctx.fillStyle = 'rgba(255,255,255,.55)'; ctx.beginPath(); ctx.ellipse(-s * 0.2, -s * 0.2, s * 0.35, s * 0.18, 0, 0, TAU); ctx.fill(); },
+    blob(ctx, s, c, c2) { ctx.fillStyle = c; ctx.beginPath(); for (let i = 0; i < 9; i++) { const a = (i / 9) * TAU, r = s * (0.8 + 0.25 * Math.sin(i * 2.7)); ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r); } ctx.closePath(); ctx.fill(); ctx.strokeStyle = c2 || '#4a3018'; ctx.lineWidth = Math.max(1.2, s * 0.1); ctx.stroke(); },
+    fang(ctx, s, c) { ctx.fillStyle = c; ctx.strokeStyle = '#1a1030'; ctx.lineWidth = Math.max(1.5, s * 0.1); ctx.beginPath(); ctx.moveTo(s * 1.5, 0); ctx.quadraticCurveTo(0, -s * 0.2, -s * 0.5, -s * 0.5); ctx.lineTo(-s * 0.5, s * 0.5); ctx.quadraticCurveTo(0, s * 0.2, s * 1.5, 0); ctx.closePath(); ctx.fill(); ctx.stroke(); }
+  };
+
+  /* ---------- helpers shared by the primitives ---------- */
+  const PR = {}; // effect primitives: PR[name] = { end(o), run(E, o) }
+  const def = (name, end, run) => { PR[name] = { end, run }; };
+  const RECIPES = {};
+
+  /* ============================================================
+     STAGE: overlay DOM + engine + timeline
+     ============================================================ */
+  let live = null; // currently playing stage
+  function mode() { const st = CD.UI && CD.UI.save && CD.UI.save().settings; const m = st && st.fx !== undefined ? st.fx : 2; return m; }
+
+  function createStage(o) {
+    const host = o.host, W = host.clientWidth || 390, H = host.clientHeight || 780;
+    const landscape = W > H;
+    const cw = Math.round(Math.min(150, W * 0.4, H * 0.37)), ch = cw * 1.4, cr = cw * 1.12;
+    const critDY = -cw * 0.78; // resting critter centre relative to the card centre
+    const pos = landscape ? { a: { x: W * 0.25, y: H * 0.6 }, d: { x: W * 0.75, y: H * 0.6 } } : { a: { x: W * 0.31, y: H * 0.7 }, d: { x: W * 0.69, y: H * 0.31 } };
+    const type = o.type || 'N';
+    const T_ = (CD.Data && CD.Data.TYPES) || {};
+    const pal = Object.assign({ c1: '#fff', c2: '#888', glow: '#fff' }, T_[type] || {});
+    const dpr = Math.min(root.devicePixelRatio || 1, W * H * 4 > 2400000 ? 1.5 : 2);
+
+    const el = doc.createElement('div'); el.className = 'fxs';
+    const cardHTML = (side) => (CD.UI && CD.UI.cardHTML ? CD.UI.cardHTML(side.card, { w: cw }) : '<div class="card"></div>');
+    const sideHTML = (cls, side) => `<div class="fxs-card ${cls}" style="left:${(cls === 'a' ? pos.a.x : pos.d.x) - cw / 2}px;top:${(cls === 'a' ? pos.a.y : pos.d.y) - ch / 2}px;width:${cw}px;height:${ch}px;font-size:${cw / 20}px">
+<div class="fxs-cardbox">${cardHTML(side)}<i class="fxs-portal"></i></div>
+<img class="fxs-crit" alt="" src="${side.sprite || ''}" style="width:${cr}px;height:${cr}px;left:${cw / 2 - cr / 2}px;top:${ch / 2 + critDY - cr / 2}px">
+<div class="fxs-hp"><b>${side.card.n}</b><span class="bar"><i></i></span><em></em></div></div>`;
+    el.innerHTML = `<div class="fxs-dim"></div><div class="fxs-in"><canvas class="fxs-bg"></canvas>${sideHTML('d', o.D)}${sideHTML('a', o.A)}<canvas class="fxs-fg"></canvas><div class="fxs-name"><span></span></div></div><div class="fxs-flash"></div><div class="fxs-tint"></div>`;
+    host.appendChild(el);
+    const $q = (s) => el.querySelector(s);
+    const inner = $q('.fxs-in'), dim = $q('.fxs-dim'), flashEl = $q('.fxs-flash'), tintEl = $q('.fxs-tint'), nameEl = $q('.fxs-name'), nameSpan = nameEl.firstChild;
+    nameSpan.textContent = ((o.atk && o.atk.n) || '') + '!'; nameEl.style.setProperty('--nc', (T_[o.type || 'N'] || pal).c1); nameEl.style.setProperty('--nc2', (T_[o.type || 'N'] || pal).c2);
+    const cvBg = $q('.fxs-bg'), cvFg = $q('.fxs-fg');
+    [cvBg, cvFg].forEach((c) => { c.width = Math.round(W * dpr); c.height = Math.round(H * dpr); c.style.width = W + 'px'; c.style.height = H + 'px'; });
+    const bg = cvBg.getContext('2d'), fg = cvFg.getContext('2d');
+    const side = {};
+    ['a', 'd'].forEach((k) => {
+      const c = $q('.fxs-card.' + k);
+      side[k] = { card: c, box: c.querySelector('.fxs-cardbox'), crit: c.querySelector('.fxs-crit'), portal: c.querySelector('.fxs-portal'), hp: c.querySelector('.fxs-hp'), bar: c.querySelector('.fxs-hp .bar i'), num: c.querySelector('.fxs-hp em'), data: k === 'a' ? o.A : o.D };
+      side[k].portal.style.background = `radial-gradient(circle at 50% 60%, ${pal.glow}, ${k === 'a' ? pal.c2 : (T_[o.D.type] || pal).c2} 70%)`;
+    });
+    // sprites for afterimages
+    const spr = {};
+    ['a', 'd'].forEach((k) => { const im = new root.Image(); im.src = side[k].data.sprite || ''; spr[k] = im; });
+
+    /* ---- engine ---- */
+    const E = {
+      W, H, cw, ch, cr, sc: o.sc || 1, pal, type, info: o.info || {}, atk: o.atk, now: 0, parts: [], sched: [], react: { a: null, d: null }, pose: { a: { dx: 0, dy: 0, rot: 0, sc: 1, tint: 0 }, d: { dx: 0, dy: 0, rot: 0, sc: 1, tint: 0 } },
+      sprite: spr, shakeAmp: 0, shakeEnd: 0, anims: [], landed: false, selfRevealed: false, lastEnd: 0, ko: !!(o.info && o.info.ko)
+    };
+    // critter centres in stage coordinates (resting pose)
+    E.A = { x: pos.a.x, y: pos.a.y + critDY }; E.D = { x: pos.d.x, y: pos.d.y + critDY };
+    E.gy = (p) => p.y + cr * 0.42; // ground line under a critter
+    E.col = (s) => (s == null ? pal.glow : COLS[s] || pal[s] || s);
+    E.pt = (w) => (w === 'A' ? E.A : w === 'D' || w == null ? E.D : w);
+    E.at = (ms, fn) => { E.sched.push({ t: E.now + ms, fn }); };
+    E.add = (p) => {
+      p.age = 0; if (p.a == null) p.a = 1; if (p.z == null) p.z = 1; if (p.rot == null) p.rot = 0; if (p.vx == null) p.vx = 0; if (p.vy == null) p.vy = 0; if (p.size == null) p.size = 8;
+      p.seed = p.seed || Math.random(); E.parts.push(p); return p;
+    };
+    E.anim = (ms, fn, delay) => { E.anims.push({ t0: E.now + (delay || 0), dur: ms, fn }); };
+    E.shake = (amp, ms) => { E.shakeAmp = Math.max(E.shakeAmp, amp * E.sc); E.shakeEnd = E.now + (ms || 400); E.shakeStart = E.now; E.shakeDur = ms || 400; };
+    E.flash = (c, a, ms) => { flashEl.style.background = c || '#fff'; E.flashA = a == null ? 0.7 : a; E.flashT0 = E.now; E.flashDur = ms || 260; };
+    E.tint = (c, a, inMs, holdMs, outMs) => { tintEl.style.background = c; E.tintI = { a, inMs: inMs || 200, hold: holdMs || 400, out: outMs || 300, t0: E.now }; };
+    E.hit = (who, str) => {
+      const from = who === 'd' ? E.A : E.D, to = who === 'd' ? E.D : E.A; const dx = to.x - from.x, dy = to.y - from.y, L = Math.hypot(dx, dy) || 1;
+      E.react[who] = { t0: E.now, str: str == null ? 0.7 : str, ux: dx / L, uy: dy / L };
+    };
+    E.sfx = (n) => { if (CD.Audio && !o.silent) CD.Audio.sfx(n); };
+    E.land = (str, quiet) => {
+      if (E.info.miss) { if (!E.landed) { E.landed = true; reveal(true); } return; }
+      E.hit('d', clamp((str == null ? 0.7 : str) * E.sc, 0.25, 1.6));
+      if (!E.landed) { E.landed = true; reveal(false); } else if (!quiet) E.sfx('hit');
+    };
+    E.revealSelf = () => { if (E.selfRevealed) return; E.selfRevealed = true; revealSelf(); };
+    E.end = (ms) => { E.lastEnd = Math.max(E.lastEnd, ms); };
+    /* named bursts used by many recipes */
+    E.burst = (kind, x, y, b) => {
+      b = b || {}; const s = (b.s || 1) * E.sc, n = Math.round((b.n || 12) * (0.75 + 0.25 * E.sc)), c = E.col(b.c), c2 = b.c2 ? E.col(b.c2) : null;
+      const radial = (cnt, sp0, sp1, mk) => { for (let i = 0; i < cnt; i++) { const a = (i / cnt) * TAU + rnd(-0.25, 0.25), sp = rnd(sp0, sp1) * s; E.add(mk(a, sp, i)); } };
+      switch (kind) {
+        case 'fire':
+          E.add({ x, y, shape: 'dot', size: 24 * s, s1: 3.2, c: '#ffb347', life: 380, add: true, vx: 0, vy: 0, a: 0.9 });
+          radial(n, 60, 260, (a, sp) => ({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 40, ay: -60, drag: 1.4, shape: 'ember', size: rnd(6, 13) * s, s1: 0.2, c: c || '#ff8a3a', c2: '#ffe27a', life: rnd(450, 800), add: true }));
+          for (let i = 0; i < Math.ceil(n / 3); i++) E.add({ x: x + rnd(-14, 14), y: y + rnd(-10, 10), vx: rnd(-30, 30), vy: rnd(-80, -30), shape: 'smoke', size: rnd(14, 24) * s, s1: 2.2, c: '#3a2a30', life: rnd(700, 1000), a: 0.5, z: 0 });
+          break;
+        case 'ring':
+          for (let i = 0; i < 2; i++) E.add({ x, y, life: 420 + i * 120, delay: i * 90, a: 0.9, add: true, c: c || '#fff', maxr: (80 + i * 36) * s, lw: 7 - i * 2, draw(ctx, p, u) { if (p.age < p.delay) return; const uu = clamp((p.age - p.delay) / (p.life - p.delay), 0, 1); ctx.strokeStyle = p.c; ctx.lineWidth = Math.max(1, p.lw * (1 - uu)); ctx.globalAlpha *= 1 - uu * uu; ctx.beginPath(); ctx.ellipse(p.x, p.y, p.maxr * EZ.out(uu), p.maxr * EZ.out(uu) * 0.78, 0, 0, TAU); ctx.stroke(); } });
+          break;
+        case 'stars': radial(n, 90, 280, (a, sp) => ({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 30, ay: 220, drag: 1.1, shape: 'star', size: rnd(6, 12) * s, s1: 0.3, c: c || '#ffe066', life: rnd(500, 800), vr: rnd(-8, 8), add: false })); break;
+        case 'sparks': radial(n, 220, 620, (a, sp) => ({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, drag: 3, shape: 'spark', size: rnd(6, 14) * s, s1: 0.3, c: c || '#fff', life: rnd(260, 420), rot: a, add: true })); break;
+        case 'shatter': radial(n, 120, 380, (a, sp) => ({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 60, ay: 520, drag: 0.6, shape: 'diamond', size: rnd(6, 13) * s, s1: 0.6, c: c || '#d4f6ff', c2: c2 || '#4aa3d6', life: rnd(600, 900), rot: a, vr: rnd(-9, 9) })); break;
+        case 'dust':
+          for (let i = 0; i < Math.ceil(n / 2); i++) E.add({ x: x + rnd(-30, 30) * s, y: y + rnd(-6, 6), vx: rnd(-90, 90) * s, vy: rnd(-50, -10), drag: 1.2, shape: 'smoke', size: rnd(14, 26) * s, s1: 2.4, c: c || '#b89a6a', life: rnd(600, 950), a: 0.55, z: 0 });
+          radial(Math.ceil(n / 2), 140, 340, (a, sp) => ({ x, y, vx: Math.cos(a) * sp * 0.8, vy: -Math.abs(Math.sin(a)) * sp - 80, ay: 700, shape: 'rock', size: rnd(3, 7) * s, c: '#a98a5a', c2: '#5a4028', life: rnd(500, 800), vr: rnd(-10, 10) }));
+          break;
+        case 'leaves': radial(n, 70, 220, (a, sp) => ({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 40, ay: 90, drag: 0.9, shape: 'leaf', size: rnd(6, 11) * s, c: c || '#6fe07a', c2: '#2b8a46', life: rnd(800, 1200), rot: a, vr: rnd(-6, 6) })); break;
+        case 'petals': radial(n, 60, 180, (a, sp) => ({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 30, ay: 70, drag: 1, shape: 'petal', size: rnd(5, 9) * s, c: c || '#ff9ad0', life: rnd(900, 1300), rot: a, vr: rnd(-5, 5) })); break;
+        case 'bubbles': for (let i = 0; i < n; i++) E.add({ x: x + rnd(-40, 40) * s, y: y + rnd(-10, 40), vx: rnd(-30, 30), vy: rnd(-120, -40), shape: 'bubble', size: rnd(4, 12) * s, c: c || '#bfeaff', life: rnd(700, 1100) }); break;
+        case 'drops': radial(n, 100, 300, (a, sp) => ({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 100, ay: 640, shape: 'drop', size: rnd(4, 8) * s, c: c || '#58b8ff', life: rnd(500, 800), rot: a })); break;
+        case 'smoke': for (let i = 0; i < n; i++) E.add({ x: x + rnd(-24, 24) * s, y: y + rnd(-18, 18), vx: rnd(-40, 40), vy: rnd(-70, -10), drag: 0.6, shape: 'smoke', size: rnd(16, 30) * s, s1: 2, c: c || '#554466', life: rnd(800, 1200), a: 0.6, z: 0 }); break;
+        case 'ink': for (let i = 0; i < n; i++) { const a = rnd(0, TAU), sp = rnd(30, 140) * s; E.add({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, drag: 1.6, shape: 'smoke', size: rnd(14, 28) * s, s1: 1.8, c: c || '#2a1a45', life: rnd(700, 1100), a: 0.75, z: 0 }); } break;
+        case 'flash': E.add({ x, y, shape: 'dot', size: 30 * s, s1: 5, c: c || '#fff', life: 330, add: true }); break;
+        case 'glitter': for (let i = 0; i < n; i++) E.add({ x: x + rnd(-50, 50) * s, y: y + rnd(-40, 50) * s, vx: rnd(-20, 20), vy: rnd(-90, -20), shape: i % 2 ? 'star' : 'diamond', size: rnd(3, 7) * s, c: c || '#fff', c2: c2 || '#c9a8ff', life: rnd(700, 1200), vr: rnd(-4, 4), add: true, fin: 0.2 }); break;
+        case 'snow': for (let i = 0; i < n; i++) { const a = rnd(0, TAU), sp = rnd(40, 200) * s; E.add({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, ay: 80, drag: 1.2, shape: 'snow', size: rnd(5, 10) * s, c: c || '#e8faff', life: rnd(700, 1100), vr: rnd(-3, 3) }); } break;
+        case 'zap':
+          radial(n, 200, 520, (a, sp) => ({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, drag: 3, shape: 'bolt', size: rnd(6, 12) * s, c: c || '#ffe44a', life: rnd(220, 380), rot: a, add: true }));
+          E.add({ x, y, shape: 'dot', size: 22 * s, s1: 3, c: c || '#ffe44a', life: 260, add: true });
+          break;
+        case 'cross': for (let i = 0; i < n; i++) E.add({ x: x + rnd(-45, 45) * s, y: y + rnd(0, 40), vx: rnd(-12, 12), vy: rnd(-90, -45), shape: 'cross', size: rnd(4, 8) * s, c: c || '#7dff9a', life: rnd(700, 1100), fin: 0.15 }); break;
+        case 'mud': radial(n, 120, 340, (a, sp) => ({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 60, ay: 560, shape: 'blob', size: rnd(4, 9) * s, c: c || '#8a6238', c2: '#4a3018', life: rnd(500, 800), vr: rnd(-6, 6) })); break;
+        default: break;
+      }
+    };
+    E.ring = (x, y, c, maxr, ms) => { E.add({ x, y, life: ms || 400, c, maxr: maxr * E.sc, add: true, draw(ctx, p, u) { ctx.strokeStyle = p.c; ctx.lineWidth = Math.max(1, 6 * (1 - u)); ctx.globalAlpha *= 1 - u * u; ctx.beginPath(); ctx.ellipse(p.x, p.y, p.maxr * EZ.out(u), p.maxr * EZ.out(u) * 0.78, 0, 0, TAU); ctx.stroke(); } }); };
+
+    /* ---- reveal: damage number, HP bars, comic word ---- */
+    const bar = { a: { from: 1, to: 1, t0: -1 }, d: { from: 1, to: 1, t0: -1 } };
+    const hpInfo = (k) => side[k].data;
+    function setBar(k, f, v) { const s = side[k]; s.bar.style.width = clamp(f, 0, 1) * 100 + '%'; s.bar.className = f < 0.34 ? 'lo' : f < 0.67 ? 'mid' : ''; s.num.textContent = Math.max(0, Math.round(v)) + '/' + hpInfo(k).max; }
+    ['a', 'd'].forEach((k) => { const d = hpInfo(k); setBar(k, d.hp0 / d.max, d.hp0); bar[k].from = d.hp0; bar[k].to = d.hp0; });
+    function tweenBar(k) { const d = hpInfo(k); if (d.hp1 === d.hp0) return; bar[k].from = d.hp0; bar[k].to = d.hp1; bar[k].t0 = E.now; }
+    function pop(txt, cls, at, dy) {
+      const d = doc.createElement('div'); d.className = 'fxs-num ' + (cls || ''); d.textContent = txt;
+      d.style.left = at.x + 'px'; d.style.top = at.y + (dy || 0) + 'px'; inner.appendChild(d); setTimeout(() => d.remove(), 1500);
+    }
+    function reveal(miss) {
+      const inf = E.info, D = E.D, A = E.A;
+      if (miss) {
+        E.sfx('tails'); pop('Miss!', 'tag', D, -E.cr * 0.4);
+        E.anim(420, (u) => { E.pose.d.dx = Math.sin(u * Math.PI) * (D.x > A.x ? 46 : -46); E.pose.d.rot = Math.sin(u * Math.PI) * 8; });
+        return;
+      }
+      E.sfx(inf.weak ? 'crit' : 'hit');
+      if (inf.dmg > 0) {
+        pop('-' + inf.dmg, inf.weak ? 'weak' : inf.dmg >= 70 ? 'big' : '', D, -E.cr * 0.3);
+        if (inf.weak) setTimeout(() => pop('Weakness!', 'tag', D, E.cr * 0.05), 170);
+        tweenBar('d');
+        if (!inf.ko && inf.dmg >= 60) E.shake(7, 300);
+      }
+      const st = { poison: 'Poisoned!', burn: 'Burned!', sleep: 'Asleep!', para: 'Paralyzed!' };
+      (inf.status || []).forEach((k, i) => setTimeout(() => { E.sfx('status'); pop(st[k] || k, 'tag', D, E.cr * 0.3 + i * 22); }, 380 + i * 200));
+      if (inf.recoil) { setTimeout(() => { E.hit('a', 0.6); pop('-' + inf.recoil, 'dot', A, -E.cr * 0.1); tweenBar('a'); }, 300); }
+      (inf.tagsD || []).forEach((t, i) => setTimeout(() => pop(t, 'tag', D, E.cr * 0.3 + i * 22), 300));
+      comicWord();
+      if (!inf.healA && !inf.tagsA) E.selfRevealed = true;
+    }
+    function revealSelf() {
+      const inf = E.info;
+      if (inf.healA) { E.sfx('heal'); pop('+' + inf.healA, 'heal', E.A, -E.cr * 0.3); tweenBar('a'); }
+      (inf.tagsA || []).forEach((t, i) => setTimeout(() => pop(t, 'tag', E.A, -E.cr * 0.3 + i * 22), i * 160));
+      if (!E.landed && !inf.dmg) comicWord();
+    }
+    function comicWord() {
+      const w = E.word; if (!w) return;
+      const d = doc.createElement('div'); d.className = 'fxs-word'; d.textContent = w;
+      const tx = E.landed && E.info.dmg === 0 ? E.A : E.D;
+      d.style.left = clamp(tx.x + rnd(-24, 24), 70, W - 70) + 'px'; d.style.top = clamp(tx.y - E.cr * 0.62, 50, H - 50) + 'px'; d.style.setProperty('--rot', rnd(-10, 10) + 'deg'); d.style.color = E.col('c1'); d.style.setProperty('--wc', E.col('c2'));
+      inner.appendChild(d); setTimeout(() => d.remove(), 1100);
+    }
+
+    /* ---- timeline ---- */
+    const L = { fly: 380, popA: 260, popD: 430, pop: 560, atk: 1020, name: 880 };
+    let tEnd = 1e9, T = 0, mul = 1, done = false, resolve = null, rafId = 0, last = 0, started = false, recipeEnd = 700;
+    const prom = new Promise((r) => { resolve = r; });
+    const spd = (o.mode === 'quick' ? 1.8 : 1) * (o.speed || 1);
+    function slotXf(k, e) {
+      const sr = side[k].data.from; if (!sr) return `translate(0,0)`;
+      const c = k === 'a' ? pos.a : pos.d; const dx = (sr.x - c.x) * (1 - e), dy = (sr.y - c.y) * (1 - e), s = lerp(sr.w / cw, 1, e);
+      return `translate(${dx}px,${dy}px) scale(${s}) rotate(${(1 - e) * (k === 'a' ? -5 : 5)}deg)`;
+    }
+    function render() {
+      const tRet = tEnd, tBack = tEnd + 300, backDur = 360;
+      const fin = EZ.out3(clamp(T / L.fly, 0, 1)), fout = EZ.io(clamp((T - tBack) / backDur, 0, 1));
+      const p = fin * (1 - fout);
+      dim.style.opacity = (0.66 * p).toFixed(3);
+      ['a', 'd'].forEach((k) => {
+        const s = side[k], bob = Math.sin(T / 300 + (k === 'a' ? 0 : 1.7)) * 2.4 * p * (1 - fout);
+        s.card.style.transform = slotXf(k, p) + ` translateY(${bob}px)`;
+        s.card.style.opacity = clamp(fin * 3, 0, 1) * (1 - clamp((fout - 0.85) / 0.15, 0, 1));
+        s.hp.style.opacity = clamp((p - 0.7) / 0.3, 0, 1);
+        const ps = k === 'a' ? L.popA : L.popD;
+        const em = EZ.back(clamp((T - ps) / L.pop, 0, 1)), rt = EZ.in(clamp((T - tRet) / 360, 0, 1));
+        let e = em * (1 - (k === 'd' && E.ko ? 0 : rt));
+        const ps_ = E.pose[k]; const re = E.react[k]; let sx = 0, sy = 0, flash = 0;
+        if (re) { const el = E.now - re.t0; const decay = Math.exp(-el / 150); sx = Math.sin(el * 0.085) * re.str * 9 * decay + re.ux * re.str * 16 * Math.exp(-el / 240) * (k === 'd' ? 1 : 1); sy = re.uy * re.str * 16 * Math.exp(-el / 240); flash = Math.exp(-el / 130) * Math.min(1, re.str + 0.2); }
+        let scl = lerp(0.24, 1, e) * ps_.sc, alpha = e < 0.03 ? 0 : 1, rot = ps_.rot, filt = '';
+        if (k === 'd' && E.ko && T > tRet) { const ko = clamp((T - tRet) / 420, 0, 1); alpha = 1 - ko; scl *= 1 + 0.25 * ko; rot += 14 * ko; }
+        const tintv = Math.max(flash, ps_.tint || 0);
+        filt = `drop-shadow(0 ${4 + e * 6}px 0 rgba(0,0,0,${0.3 * e})) drop-shadow(0 0 ${6 + e * 10}px ${rgba(pal.glow, 0.55 * e)})` + (tintv > 0.02 ? ` brightness(${1 + tintv * 1.4}) saturate(${1 - tintv * 0.5})` : '');
+        const rx = ps_.dx + sx, ry = (1 - Math.min(e, 1)) * cw * 0.58 + ps_.dy + sy;
+        s.crit.style.transform = `translate(${rx}px,${ry}px) rotate(${rot}deg) scale(${scl})`;
+        s.crit.style.opacity = alpha; s.crit.style.filter = filt;
+        s.portal.style.opacity = (clamp(em, 0, 1) * 0.9 * (1 - (k === 'd' && E.ko ? 0 : rt))).toFixed(3);
+        // hp bars
+        const b = bar[k]; if (b.t0 >= 0) { const u = EZ.out(clamp((E.now - b.t0) / 520, 0, 1)), v = lerp(b.from, b.to, u); setBar(k, v / hpInfo(k).max, v); }
+      });
+      // attack name plate
+      const nameIn = clamp((T - L.name) / 220, 0, 1), nameOut = clamp((T - (L.atk + Math.min(recipeEnd, 900) * 0.7)) / 240, 0, 1);
+      nameEl.style.opacity = nameIn * (1 - nameOut); nameSpan.style.transform = `scale(${lerp(1.5, 1, EZ.back(nameIn))}) rotate(-2deg)`;
+      // shake
+      let shx = 0, shy = 0; if (E.shakeAmp > 0 && E.now < E.shakeEnd) { const u = 1 - (E.now - E.shakeStart) / E.shakeDur; const a = E.shakeAmp * u * u; shx = rnd(-a, a); shy = rnd(-a, a); }
+      inner.style.transform = shx || shy ? `translate(${shx}px,${shy}px)` : '';
+      // flash + tint
+      if (E.flashT0 != null) { const u = (E.now - E.flashT0) / E.flashDur; flashEl.style.opacity = u >= 1 ? 0 : (E.flashA * (1 - u)).toFixed(3); }
+      if (E.tintI) { const t = E.tintI, el = E.now - t.t0; const v = el < t.inMs ? el / t.inMs : el < t.inMs + t.hold ? 1 : 1 - (el - t.inMs - t.hold) / t.out; tintEl.style.opacity = (clamp(v, 0, 1) * t.a).toFixed(3); }
+      // canvases
+      bg.setTransform(dpr, 0, 0, dpr, 0, 0); fg.setTransform(dpr, 0, 0, dpr, 0, 0); bg.clearRect(0, 0, W, H); fg.clearRect(0, 0, W, H);
+      for (let i = 0; i < E.parts.length; i++) {
+        const q = E.parts[i]; const ctx = q.z === 0 ? bg : fg; const u = clamp(q.age / q.life, 0, 1);
+        const hold = q.hold == null ? 0.55 : q.hold; let al = q.a;
+        if (q.fin) al *= Math.min(1, u / q.fin);
+        if (q.fade !== 0 && u > hold) al *= (1 - u) / (1 - hold);
+        if (al <= 0.004) continue;
+        ctx.save(); ctx.globalAlpha = clamp(al, 0, 1); ctx.globalCompositeOperation = q.add ? 'lighter' : 'source-over';
+        if (q.draw) q.draw(ctx, q, u);
+        else { ctx.translate(q.x, q.y); ctx.rotate(q.rot); const s = q.s1 == null ? q.size : lerp(q.size, q.size * q.s1, u); SH[q.shape](ctx, Math.max(0.5, s), q.c, q.c2, q); }
+        ctx.restore();
+      }
+    }
+    function update(dt) {
+      E.now += dt; T += dt;
+      for (let guard = 0; guard < 6; guard++) {
+        const due = E.sched.filter((s) => s.t <= E.now); if (!due.length) break;
+        E.sched = E.sched.filter((s) => s.t > E.now); due.sort((a, b) => a.t - b.t).forEach((s) => { try { s.fn(); } catch (err) { (CD.FX.errors = CD.FX.errors || []).push((o.atk && o.atk.n) + ': ' + (err && err.stack || err)); } });
+      }
+      for (let i = 0; i < E.anims.length; i++) { const a = E.anims[i]; if (E.now < a.t0) continue; const u = clamp((E.now - a.t0) / a.dur, 0, 1); a.fn(u); a.done = u >= 1; }
+      E.anims = E.anims.filter((a) => !a.done);
+      for (let i = 0; i < E.parts.length; i++) {
+        const q = E.parts[i]; q.age += dt; const ds = dt / 1000;
+        if (q.upd) q.upd(q, dt, ds);
+        else { if (q.drag) { const f = Math.max(0, 1 - q.drag * ds); q.vx *= f; q.vy *= f; } if (q.ax) q.vx += q.ax * ds; if (q.ay) q.vy += q.ay * ds; q.x += q.vx * ds; q.y += q.vy * ds; if (q.vr) q.rot += q.vr * ds; }
+      }
+      E.parts = E.parts.filter((q) => q.age < q.life);
+      if (!started && T >= L.atk) { started = true; startRecipe(); }
+      if (T >= tEnd + 300 + 360 + 40 && !done) finish();
+    }
+    function startRecipe() {
+      const rec = o.recipe; E.word = rec.word; let end = 600;
+      E.sfx(rec.sfx || 'whoosh');
+      (rec.steps || []).forEach((st) => { const P = PR[st[0]]; if (!P) return; const op = st[1] || {}; const at = op.at || 0; end = Math.max(end, at + (P.end ? P.end(op) : 500)); E.at(at, () => P.run(E, op)); });
+      // safety net: if nothing landed, land at the end of the recipe so numbers always appear
+      E.at(end + 20, () => { if (!E.landed) E.land(0.5); E.revealSelf(); });
+      recipeEnd = end; tEnd = L.atk + end + 320;
+    }
+    function finish() {
+      if (done) return; done = true; cancelAnimationFrame(rafId);
+      ['a', 'd'].forEach((k) => { const sl = side[k].data.slotEl; if (sl) sl.style.visibility = ''; });
+      el.remove(); if (live === api) live = null; resolve();
+    }
+    function loop(ts) {
+      if (done) return; const dt = Math.min(50, ts - (last || ts)) * spd * mul; last = ts;
+      update(dt); render(); rafId = requestAnimationFrame(loop);
+    }
+    el.addEventListener('pointerdown', () => { mul = 3.2; });
+    ['a', 'd'].forEach((k) => { const sl = side[k].data.slotEl; if (sl) sl.style.visibility = 'hidden'; });
+    E.sfx('emerge');
+    render();
+    const api = {
+      promise: prom, E, el, abort() { if (!done) { done = true; cancelAnimationFrame(rafId); ['a', 'd'].forEach((k) => { const sl = side[k].data.slotEl; if (sl) sl.style.visibility = ''; }); el.remove(); if (live === api) live = null; resolve(); } },
+      step(ms) { update(ms); render(); }, // manual stepping (used by tests)
+      get time() { return T; }, get endsAt() { return tEnd; }, landed: () => E.landed
+    };
+    if (!o.manual) rafId = requestAnimationFrame(loop);
+    return api;
+  }
+
+  /* ============================================================
+     PART 2 — effect primitives. Each is { end(o) -> ms, run(E, o) }.
+     Options common to all: at (delay ms), c (colour name/hex), s (size multiplier).
+     Contact effects call E.land() (defender reacts, damage number appears) unless land:0.
+     ============================================================ */
+  const ADD = { orb: 1, ember: 1, dot: 1, wisp: 1, spark: 1, streak: 1, bolt: 1, star: 0 };
+  const FACE = { diamond: 1, spike: 1, drop: 1, streak: 1, spark: 1, wisp: 1, fang: 1, bolt: 0, leaf: 0, seed: 1 };
+  const FROM = (E, o) => (o.from === 'sky' ? { x: E.D.x + (o.fx || 0), y: -40 } : E.pt(o.from || 'A'));
+  const TO = (E, o) => E.pt(o.to || 'D');
+  const jag = (x0, y0, x1, y1, amp, step, seed) => {
+    const pts = [[x0, y0]], L = Math.hypot(x1 - x0, y1 - y0), n = Math.max(3, Math.round(L / step)), nx = -(y1 - y0) / L, ny = (x1 - x0) / L;
+    for (let i = 1; i < n; i++) { const t = i / n, r = Math.sin(seed * 91.7 + i * 12.9898) * 43758.5453, f = (r - Math.floor(r) - 0.5) * 2 * amp; pts.push([lerp(x0, x1, t) + nx * f, lerp(y0, y1, t) + ny * f]); }
+    pts.push([x1, y1]); return pts;
+  };
+  const strokePts = (ctx, pts) => { ctx.beginPath(); pts.forEach((p, i) => (i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1]))); ctx.stroke(); };
+
+  def('proj', (o) => (o.dur || 380) + ((o.n || 1) - 1) * (o.gap || 90) + 80, (E, o) => {
+    const n = o.n || 1, gap = o.gap || 90, dur = o.dur || 380, shape = o.shape || 'orb';
+    for (let i = 0; i < n; i++) {
+      E.at(i * gap, () => {
+        const A = FROM(E, o), D = TO(E, o), dx = D.x - A.x, dy = D.y - A.y, Ld = Math.hypot(dx, dy) || 1, ang = Math.atan2(dy, dx), nx = -dy / Ld, ny = dx / Ld;
+        const lane = n > 1 ? (i - (n - 1) / 2) / ((n - 1) / 2) : 0, off = o.spread ? (o.rand ? rnd(-1, 1) : lane) * o.spread : 0;
+        const arc = (o.arc || 0) * (o.flip && i % 2 ? -1 : 1), wob = o.wobble || 0, ph = rnd(0, TAU), size = (o.size || 14) * E.sc, c = E.col(o.c), c2 = o.c2 ? E.col(o.c2) : null, ez = EZ[o.ease || 'lin'];
+        let tAcc = 0, px = A.x, py = A.y;
+        E.add({
+          life: dur, shape, size, c, c2, add: !!ADD[shape], fade: 0, rot: ang, x: A.x, y: A.y, vr: 0,
+          upd(p, dt) {
+            const u = ez(clamp(p.age / dur, 0, 1)), side = off * (1 - u * 0.85) + arc * Math.sin(Math.PI * u) + wob * Math.sin(ph + u * 14) * (1 - u * 0.4);
+            const nxp = A.x + dx * u + nx * side, nyp = A.y + dy * u + ny * side;
+            if (o.spin) p.rot += o.spin * dt / 1000; else if (FACE[shape] !== 0 && Math.hypot(nxp - p.x, nyp - p.y) > 0.3) p.rot = Math.atan2(nyp - p.y, nxp - p.x);
+            p.x = nxp; p.y = nyp; tAcc += dt;
+            if (o.trail) while (tAcc > (o.rate || 28)) {
+              tAcc -= o.rate || 28; const ts = o.trail;
+              E.add({ x: p.x + rnd(-3, 3), y: p.y + rnd(-3, 3), vx: rnd(-25, 25), vy: rnd(-25, 25) + (ts === 'smoke' ? -25 : 0), shape: ts, size: size * (ts === 'smoke' ? 0.9 : 0.55), s1: ts === 'smoke' ? 2 : 0.2, c: o.tc ? E.col(o.tc) : (ts === 'smoke' ? '#4a3a40' : c), c2: c2, life: rnd(240, 400), add: !!ADD[ts], a: 0.8, z: 0, rot: rnd(0, TAU), vr: rnd(-4, 4) });
+            }
+          }
+        });
+        E.at(dur, () => {
+          if (o.hit) E.burst(o.hit, D.x + rnd(-6, 6), D.y + rnd(-6, 6), { n: o.hn || 9, s: o.hs || 0.7, c: o.hc || o.c });
+          if (o.land !== 0) E.land(i === n - 1 ? 0.85 : 0.45, i < n - 1);
+        });
+      });
+    }
+  });
+
+  def('beam', (o) => (o.dur || 620) + 80, (E, o) => {
+    const A = FROM(E, o), D = TO(E, o), dur = o.dur || 620, grow = o.grow || 150, w = (o.w || 20) * E.sc, c = E.col(o.c), core = E.col(o.core || 'white'), style = o.style || 'plain';
+    const dx = D.x - A.x, dy = D.y - A.y, L = Math.hypot(dx, dy) || 1, nx = -dy / L, ny = dx / L;
+    if (o.land !== 0) E.at(grow * 0.9, () => E.land(0.8));
+    for (let k = 1; k < dur / 140; k++) E.at(grow + k * 140, () => { E.hit('d', 0.28); E.burst('sparks', D.x, D.y, { n: 3, s: 0.6, c: o.sc ? E.col(o.sc) : core }); });
+    E.add({
+      life: dur, z: 1, add: true, fade: 0,
+      draw(ctx, p) {
+        const age = p.age, gp = clamp(age / grow, 0, 1), out = age > dur - 170 ? clamp((dur - age) / 170, 0, 1) : 1, bucket = Math.floor(age / 55);
+        ctx.globalAlpha *= out; const N = 26, pts = [], pts2 = [];
+        for (let i = 0; i <= N; i++) {
+          const t = (i / N) * gp; let off = 0, off2 = 0;
+          if (style === 'wave') off = Math.sin(t * 15 - age * 0.022) * w * 0.55 * (0.35 + t);
+          else if (style === 'zig') { const r = Math.sin(i * 12.9898 + bucket * 78.233) * 43758.5453; off = (r - Math.floor(r) - 0.5) * w * 1.7; }
+          else if (style === 'twist') { off = Math.sin(t * 20 - age * 0.03) * w * 0.8; off2 = -off; }
+          pts.push([A.x + dx * t + nx * off, A.y + dy * t + ny * off]); if (style === 'twist') pts2.push([A.x + dx * t + nx * off2, A.y + dy * t + ny * off2]);
+        }
+        ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+        if (style === 'pulse') {
+          for (let i = 0; i < 14; i++) { const t = ((i / 14 + age / 520) % 1) * gp; ctx.fillStyle = rgba(c, 0.85); ctx.beginPath(); ctx.arc(A.x + dx * t, A.y + dy * t, w * (0.6 + 0.35 * Math.sin(i + age * 0.02)), 0, TAU); ctx.fill(); }
+          ctx.strokeStyle = rgba(c, 0.35); ctx.lineWidth = w * 0.6; strokePts(ctx, pts);
+        } else if (style === 'twist') {
+          [pts, pts2].forEach((pp) => { ctx.strokeStyle = rgba(c, 0.4); ctx.lineWidth = w * 1.4; strokePts(ctx, pp); ctx.strokeStyle = c; ctx.lineWidth = w * 0.65; strokePts(ctx, pp); });
+          ctx.strokeStyle = core; ctx.lineWidth = w * 0.3; strokePts(ctx, [pts[0], pts[pts.length - 1]]);
+        } else {
+          ctx.strokeStyle = rgba(c, 0.25); ctx.lineWidth = w * 2.4; strokePts(ctx, pts);
+          ctx.strokeStyle = rgba(c, 0.6); ctx.lineWidth = w * 1.4; strokePts(ctx, pts);
+          ctx.strokeStyle = c; ctx.lineWidth = w * 0.9; strokePts(ctx, pts);
+          ctx.strokeStyle = core; ctx.lineWidth = w * (style === 'zig' ? 0.35 : 0.5); strokePts(ctx, pts);
+        }
+        ctx.save(); ctx.translate(A.x, A.y); glow(ctx, w * (2 + 0.3 * Math.sin(age * 0.03)), c, 0.9); ctx.restore();
+        if (gp >= 1) { ctx.save(); ctx.translate(D.x, D.y); glow(ctx, w * (2.8 + 0.4 * Math.sin(age * 0.04)), c, 0.95); glow(ctx, w * 1.2, core, 0.9); ctx.restore(); }
+      }
+    });
+  });
+
+  def('bolt', (o) => (o.n || 3) * (o.gap || 100) + 300, (E, o) => {
+    const n = o.n || 3, gap = o.gap || 100, c = E.col(o.c || 'gold'), w = o.w || 4;
+    for (let i = 0; i < n; i++) E.at(i * gap, () => {
+      const D = E.D, A = o.from === 'A' ? E.A : { x: D.x + rnd(-60, 60), y: -20 }, tx = D.x + rnd(-14, 14), ty = D.y + rnd(-10, 14), main = jag(A.x, A.y, tx, ty, 16 * E.sc, 20, Math.random() * 9);
+      const br = []; for (let b = 0; b < 2; b++) { const m = main[Math.floor(main.length * rnd(0.3, 0.7))]; br.push(jag(m[0], m[1], m[0] + rnd(-70, 70), m[1] + rnd(30, 90), 8, 14, Math.random() * 9)); }
+      E.add({ life: 260, z: 1, add: true, fade: 0, draw(ctx, p) { const fl = p.age % 80 < 52 ? 1 : 0.35, out = 1 - clamp((p.age - 140) / 120, 0, 1); ctx.globalAlpha *= fl * out; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = rgba(c, 0.55); ctx.lineWidth = w * 3.4 * E.sc; strokePts(ctx, main); br.forEach((b) => { ctx.lineWidth = w * 1.8; strokePts(ctx, b); }); ctx.strokeStyle = '#fff'; ctx.lineWidth = w * 1.1 * E.sc; strokePts(ctx, main); br.forEach((b) => { ctx.lineWidth = 1.5; strokePts(ctx, b); }); } });
+      E.burst('zap', tx, ty, { n: 6, s: 0.7, c: o.c }); E.shake(5, 170); E.flash('#fffbd0', 0.3, 120);
+      if (o.land !== 0) E.land(0.65, i < n - 1);
+    });
+  });
+
+  def('slash', (o) => (o.n || 3) * (o.gap || 70) + 330, (E, o) => {
+    const kind = o.kind || 'claw', n = o.n || (kind === 'cross' ? 2 : kind === 'arc' ? 1 : kind === 'rake' ? 4 : 3), gap = o.gap || 70, c = E.col(o.c), s = (o.s || 1);
+    for (let i = 0; i < n; i++) E.at(i * gap, () => {
+      const D = E.D, len = E.cr * 1.05 * s * E.sc, W = (o.w || (kind === 'rake' ? 6 : 11)) * E.sc; let ang = ((o.ang == null ? -38 : o.ang) * Math.PI) / 180, ox = 0, oy = 0, curve = 0.32;
+      if (kind === 'claw') { const k = (i - (n - 1) / 2) * 26 * s; ox = -Math.sin(ang) * k; oy = Math.cos(ang) * k; }
+      else if (kind === 'cross') { ang += i ? Math.PI * 0.55 : 0; curve = 0.18; }
+      else if (kind === 'rake') { const k = (i - (n - 1) / 2) * 18 * s; ox = -Math.sin(ang) * k; oy = Math.cos(ang) * k; curve = 0.12; }
+      else if (kind === 'arc') { curve = 0.5; }
+      const cx = D.x + ox, cy = D.y + oy, dxr = Math.cos(ang), dyr = Math.sin(ang), px = -dyr, py = dxr;
+      const P0 = [cx - dxr * len / 2, cy - dyr * len / 2], P2 = [cx + dxr * len / 2, cy + dyr * len / 2], P1 = [cx + px * len * curve, cy + py * len * curve];
+      const at = (t) => { const a = 1 - t; return [a * a * P0[0] + 2 * a * t * P1[0] + t * t * P2[0], a * a * P0[1] + 2 * a * t * P1[1] + t * t * P2[1]]; };
+      E.add({
+        life: 420, z: 1, add: true, fade: 0,
+        draw(ctx, p) {
+          const head = clamp(p.age / 110, 0, 1), tail = clamp((p.age - 90) / 260, 0, 1) * head, out = 1 - clamp((p.age - 260) / 160, 0, 1); if (head <= tail) return; ctx.globalAlpha *= out;
+          const make = (wf) => { const L = [], R = [], N = 14; for (let k = 0; k <= N; k++) { const t = lerp(tail, head, k / N), q = at(t), q2 = at(Math.min(1, t + 0.01)), q1 = at(Math.max(0, t - 0.01)), tx = q2[0] - q1[0], ty = q2[1] - q1[1], tl = Math.hypot(tx, ty) || 1, w = Math.sin(Math.PI * ((t - tail) / Math.max(0.0001, head - tail) * 0.8 + 0.1)) * W * wf; L.push([q[0] - ty / tl * w, q[1] + tx / tl * w]); R.push([q[0] + ty / tl * w, q[1] - tx / tl * w]); } ctx.beginPath(); L.concat(R.reverse()).forEach((pt, k) => (k ? ctx.lineTo(pt[0], pt[1]) : ctx.moveTo(pt[0], pt[1]))); ctx.closePath(); };
+          make(1.6); ctx.fillStyle = rgba(c, 0.55); ctx.fill(); make(1); ctx.fillStyle = c; ctx.fill(); make(0.45); ctx.fillStyle = '#fff'; ctx.fill();
+        }
+      });
+      E.at(70, () => { E.burst('sparks', D.x + ox, D.y + oy, { n: 5, s: 0.7, c: o.c }); if (o.land !== 0) E.land(0.55, i < n - 1); });
+    });
+  });
+
+  def('bite', (o) => 560, (E, o) => {
+    const D = E.D, s = (o.s || 1) * E.sc, kind = o.kind || 'jaw', Wj = E.cr * 0.95 * s, c = E.col(o.c || 'white'), gum = E.col(o.g || 'c2'), n = kind === 'fang' ? 2 : 6;
+    E.add({
+      life: 560, z: 1, fade: 0,
+      draw(ctx, p) {
+        const a = p.age, close = EZ.in(clamp(a / 170, 0, 1)), open = a > 300 ? EZ.out(clamp((a - 300) / 220, 0, 1)) : 0, g = lerp(Wj * 0.62, Wj * 0.03, close) + open * Wj * 0.55, al = 1 - clamp((a - 400) / 160, 0, 1);
+        ctx.globalAlpha *= al; ctx.translate(D.x, D.y + E.cr * 0.04);
+        for (let side = -1; side <= 1; side += 2) {
+          const y0 = side * g / 2, th = Wj * (kind === 'fang' ? 0.42 : 0.25);
+          ctx.fillStyle = rgba(gum, 0.92); ctx.strokeStyle = '#1a1030'; ctx.lineWidth = 3;
+          ctx.beginPath(); ctx.rect(-Wj / 2, side < 0 ? y0 - Wj * 0.16 : y0, Wj, Wj * 0.16); ctx.fill(); ctx.stroke();
+          for (let t = 0; t < n; t++) {
+            const x = kind === 'fang' ? (t ? 1 : -1) * Wj * 0.26 : -Wj / 2 + Wj * (t + 0.5) / n, w = kind === 'fang' ? Wj * 0.1 : Wj / n * 0.42, h = (t % 2 && kind !== 'fang' ? 0.78 : 1) * th * (kind === 'fang' && side > 0 ? 0.4 : 1);
+            ctx.fillStyle = c; ctx.beginPath(); ctx.moveTo(x - w, y0); ctx.lineTo(x + w, y0); ctx.lineTo(x, y0 - side * h); ctx.closePath(); ctx.fill(); ctx.stroke();
+          }
+        }
+      }
+    });
+    E.at(170, () => { E.burst('sparks', D.x, D.y, { n: 8, s: 0.8, c: o.c || 'white' }); E.shake(4, 140); if (o.land !== 0) E.land(0.9); });
+  });
+
+  def('burst', (o) => 700, (E, o) => { const P = E.pt(o.on); E.burst(o.k, P.x + (o.ox || 0), (o.ground ? E.gy(P) : P.y) + (o.oy || 0), o); });
+
+  def('rush', (o) => (o.dur || 560) + 60, (E, o) => {
+    const dur = o.dur || 560, A = E.A, D = E.D, dx = D.x - A.x, dy = D.y - A.y, L = Math.hypot(dx, dy), ux = dx / L, uy = dy / L, reach = (o.to || 0.8) * L, arc = (o.arc || 0) * E.sc, spin = o.spin || 0, pose = E.pose.a;
+    E.anim(dur, (u) => {
+      let f; if (u < 0.22) f = -0.1 * EZ.out(u / 0.22); else if (u < 0.4) f = lerp(-0.1, 1, EZ.in((u - 0.22) / 0.18)); else if (u < 0.52) f = 1; else f = 1 - EZ.out3((u - 0.52) / 0.48);
+      pose.dx = ux * reach * f; pose.dy = uy * reach * f - (u > 0.22 && u < 0.56 ? arc * Math.sin(Math.PI * clamp((u - 0.22) / 0.34, 0, 1)) : 0);
+      pose.rot = spin ? spin * EZ.io(clamp((u - 0.2) / 0.5, 0, 1)) : (u > 0.2 && u < 0.55 ? (ux > 0 ? 9 : -9) : 0); pose.sc = 1 + (u > 0.38 && u < 0.5 ? 0.14 : 0); if (u >= 1) { pose.dx = pose.dy = pose.rot = 0; pose.sc = 1; }
+    });
+    if (o.ghost !== false) for (let k = 0; k < 7; k++) E.at(dur * 0.22 + k * 28, () => { const gx = E.A.x + pose.dx, gy = E.A.y + pose.dy; E.add({ x: gx, y: gy, life: 240, z: 0, a: 0.4, fade: 1, hold: 0, draw(ctx, p, u) { const im = E.sprite.a; if (!im.complete || !im.naturalWidth) return; ctx.globalAlpha *= 0.35 * (1 - u); ctx.drawImage(im, p.x - E.cr / 2, p.y - E.cr / 2, E.cr, E.cr); } }); });
+    E.at(dur * 0.4, () => { if (o.land) E.land(o.str || 0.9); if (o.hit) E.burst(o.hit, D.x - ux * E.cr * 0.3, D.y - uy * E.cr * 0.3, { n: o.hn || 8, s: o.hs || 0.8, c: o.hc }); if (o.shake) E.shake(o.shake, 220); });
+  });
+
+  def('rain', (o) => (o.dur || 360) + (o.n || 8) * (o.gap || 60) + 300, (E, o) => {
+    const n = o.n || 8, gap = o.gap || 60, dur = o.dur || 360, shape = o.shape || 'rock', area = o.area || 60, c = E.col(o.c), c2 = o.c2 ? E.col(o.c2) : null;
+    for (let i = 0; i < n; i++) E.at(i * gap, () => {
+      const D = E.D, x1 = D.x + rnd(-area, area), y1 = D.y + rnd(-10, 28), x0 = x1 + (o.slant || 0), y0 = -30, ang = Math.atan2(y1 - y0, x1 - x0), size = (o.size || 14) * E.sc * rnd(0.8, 1.2), seed = Math.random();
+      E.add({ life: dur, shape, size, c, c2, add: !!ADD[shape], fade: 0, seed, x: x0, y: y0, rot: FACE[shape] ? ang : rnd(0, TAU), vr: FACE[shape] ? 0 : rnd(-9, 9), upd(p, dt) { const u = Math.pow(clamp(p.age / dur, 0, 1), 1.55); p.x = lerp(x0, x1, u); p.y = lerp(y0, y1, u); if (p.vr) p.rot += p.vr * dt / 1000; if (o.trail && Math.random() < 0.6) E.add({ x: p.x, y: p.y, vx: rnd(-20, 20), vy: rnd(-10, 30), shape: o.trail, size: size * 0.5, s1: 0.2, c, life: 300, add: !!ADD[o.trail], a: 0.7, z: 0 }); } });
+      E.at(dur, () => { E.burst(o.hit || 'dust', x1, y1 + 10, { n: o.hn || 5, s: o.hs || 0.55, c: o.hc }); if (i % 3 === 0) E.shake(3, 100); if (o.land !== 0) E.land(0.45, i < n - 1); });
+    });
+  });
+
+  const SPIKE = { ice: ['#f2fcff', '#5fb6e6'], stone: ['#d6b784', '#6a4a28'], thorn: ['#7be889', '#1f6a35'], crystal: ['#ffd0ee', '#7a52e0'], shade: ['#9a6af0', '#1a0a3a'], fire: ['#ffd27a', '#e0451c'], bone: ['#fff6dc', '#b09868'] };
+  def('spikes', (o) => 680, (E, o) => {
+    const D = E.D, n = o.n || 5, W = (o.w || 90) * E.sc, gy = E.gy(D), cols = SPIKE[o.kind || 'stone'] || SPIKE.stone, c = o.c ? E.col(o.c) : cols[0], c2 = o.c2 ? E.col(o.c2) : cols[1], thorn = (o.kind || '') === 'thorn';
+    for (let i = 0; i < n; i++) {
+      const x = D.x + (n > 1 ? (i - (n - 1) / 2) * (W / (n - 1)) : 0) + rnd(-6, 6), h = (o.h || 100) * E.sc * rnd(0.75, 1.2), tilt = (i - (n - 1) / 2) * 7 + rnd(-8, 8), bw = h * 0.2, delay = Math.abs(i - (n - 1) / 2) * 55;
+      E.add({ life: 560 + delay, z: 1, fade: 0, draw(ctx, p) { const a = p.age - delay; if (a < 0) return; const gr = EZ.out(clamp(a / 150, 0, 1)), re = a > 330 ? 1 - EZ.in(clamp((a - 330) / 200, 0, 1)) : 1, hh = h * gr * re; if (hh < 2) return; const g = ctx.createLinearGradient(x, gy, x + tilt, gy - hh); g.addColorStop(0, c2); g.addColorStop(1, c); ctx.fillStyle = g; ctx.strokeStyle = o.kind === 'shade' ? '#d8c0ff' : '#1a1030'; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.moveTo(x - bw, gy); ctx.lineTo(x + tilt, gy - hh); ctx.lineTo(x + bw, gy); ctx.closePath(); ctx.fill(); ctx.stroke(); if (thorn) { ctx.strokeStyle = c2; ctx.lineWidth = 3; [0.35, 0.6].forEach((t) => { const px = x + tilt * t, py = gy - hh * t; ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px - 11, py - 6); ctx.moveTo(px, py); ctx.lineTo(px + 11, py - 6); ctx.stroke(); }); } else { ctx.strokeStyle = 'rgba(255,255,255,.65)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x - bw * 0.3, gy - hh * 0.2); ctx.lineTo(x + tilt * 0.8, gy - hh * 0.85); ctx.stroke(); } } });
+    }
+    E.at(60, () => { E.burst(o.kind === 'ice' ? 'snow' : 'dust', D.x, gy, { n: 12, s: 1, c: o.dc }); E.shake(5, 220); if (o.land !== 0) E.land(0.9); });
+  });
+
+  def('quake', (o) => (o.dur || 600) + 120, (E, o) => {
+    const D = E.D, dur = o.dur || 600, g = { x: D.x, y: E.gy(D) }, glowC = o.glow ? E.col(o.glow) : null, nC = o.cracks == null ? 6 : o.cracks;
+    E.shake(o.amp || 10, dur);
+    for (let i = 0; i < nC; i++) { const L = rnd(60, 130) * E.sc, ang = ((i + rnd(0.1, 0.9)) / nC) * TAU, pts = jag(g.x, g.y, g.x + Math.cos(ang) * L * 1.2, g.y + Math.sin(ang) * L * 0.35, 8, 14, Math.random() * 9); E.add({ life: dur, z: 0, fade: 0, draw(ctx, p) { const gr = clamp(p.age / 200, 0, 1), out = 1 - clamp((p.age - dur * 0.6) / (dur * 0.4), 0, 1), cnt = Math.max(2, Math.round(pts.length * gr)); ctx.globalAlpha *= out; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; if (glowC) { ctx.strokeStyle = rgba(glowC, 0.7); ctx.lineWidth = 10; strokePts(ctx, pts.slice(0, cnt)); } ctx.strokeStyle = '#2a1a10'; ctx.lineWidth = 4.5; strokePts(ctx, pts.slice(0, cnt)); } }); }
+    E.burst('dust', g.x, g.y, { n: 14, s: 1.3, c: o.c });
+    E.at(dur * 0.3, () => E.burst('dust', g.x + rnd(-40, 40), g.y, { n: 8, s: 1, c: o.c }));
+    E.at(90, () => { if (o.land !== 0) E.land(1); });
+  });
+
+  def('swirl', (o) => (o.dur || 800) + 320, (E, o) => {
+    const P = E.pt(o.on || 'D'), n = o.n || 28, dur = o.dur || 800, r0 = (o.r0 || 100) * E.sc, r1 = (o.r1 || 20) * E.sc, turns = o.turns || 2.5, shape = o.shape || 'ember', c = E.col(o.c), c2 = o.c2 ? E.col(o.c2) : null;
+    for (let i = 0; i < n; i++) { const a0 = (i / n) * TAU + rnd(-0.3, 0.3), dl = rnd(0, dur * 0.3), fr = rnd(0.7, 1.1), life = dur * 0.7; E.at(dl, () => E.add({ life, shape, size: (o.size || 9) * E.sc * rnd(0.8, 1.25), c, c2, add: !!ADD[shape], fade: 1, hold: 0.7, x: P.x, y: P.y, rot: 0, upd(p, dt) { const u = p.age / life, a = a0 + turns * TAU * EZ.io(u), r = lerp(r0, r1, EZ.in(u)) * fr; p.x = P.x + Math.cos(a) * r; p.y = P.y + Math.sin(a) * r * 0.55 + (o.rise || 0) * u; p.rot = o.wind || shape === 'streak' || shape === 'spark' ? a + Math.PI / 2 : p.rot + (o.spin || 0) * dt / 1000; } })); }
+    if (o.rings) E.add({ life: dur, z: 0, fade: 0, draw(ctx, p) { const u = p.age / dur, al = Math.sin(Math.PI * clamp(u, 0, 1)); ctx.globalAlpha *= al * 0.8; ctx.lineWidth = 5; for (let k = 0; k < 3; k++) { const r = lerp(r0, r1, EZ.in(clamp(u + k * 0.1, 0, 1))) * (1 - k * 0.2); ctx.strokeStyle = rgba(c, 0.8 - k * 0.2); ctx.beginPath(); ctx.ellipse(P.x, P.y + E.cr * 0.18, r, r * 0.38, u * 4 + k, 0, TAU * 0.8); ctx.stroke(); } } });
+    if (o.land !== 0) { E.at(dur * 0.45, () => E.land(0.7, true)); E.at(dur * 0.7, () => E.land(0.9)); }
+    E.shake(o.shake || 4, dur * 0.7);
+  });
+
+  def('cloud', (o) => (o.dur || 900) + 260, (E, o) => {
+    const P = E.pt(o.on || 'D'), kind = o.kind || 'gas', n = o.n || 12, dur = o.dur || 900;
+    const col = { gas: 'toxic', zzz: '#5a6ad0', spore: 'spore', ink: '#2a1a45', fog: '#e8f0ff', ash: '#4a4048' }[kind];
+    const c = o.c ? E.col(o.c) : COLS[col] || col;
+    for (let i = 0; i < n; i++) E.at((i / n) * dur * 0.5, () => E.add({ x: P.x + rnd(-E.cr * 0.4, E.cr * 0.4), y: P.y + rnd(-E.cr * 0.3, E.cr * 0.45), vx: rnd(-26, 26), vy: rnd(-46, -8), drag: 0.4, shape: 'smoke', size: rnd(20, 34) * E.sc, s1: 1.7, c, life: rnd(800, 1200), a: kind === 'fog' ? 0.55 : 0.62, z: i % 2 }));
+    if (kind === 'gas') for (let i = 0; i < 7; i++) E.at(i * 90, () => E.add({ x: P.x + rnd(-40, 40), y: P.y + rnd(0, 40), vx: rnd(-20, 20), vy: rnd(-80, -30), shape: 'bubble', size: rnd(4, 9) * E.sc, c: E.col('toxic'), life: rnd(700, 1000) }));
+    if (kind === 'zzz') for (let i = 0; i < 4; i++) E.at(i * 170, () => E.add({ x: P.x + 10 + i * 8, y: P.y - E.cr * 0.2, vy: -52, vx: 22, shape: 'zz', size: 9 + i * 3.5, c: '#d8e0ff', life: 1100, fin: 0.2, upd(p, dt, ds) { p.x += (22 + Math.sin(p.age * 0.006) * 28) * ds; p.y += p.vy * ds; } }));
+    if (kind === 'spore') for (let i = 0; i < 16; i++) E.at(i * 40, () => E.add({ x: P.x + rnd(-E.cr * 0.5, E.cr * 0.5), y: P.y + rnd(-E.cr * 0.4, E.cr * 0.4), vx: rnd(-30, 30), vy: rnd(-50, -5), shape: 'dot', size: rnd(3, 6), c: '#fff6a0', life: rnd(800, 1200), add: true, fin: 0.2 }));
+    if (kind === 'ash') for (let i = 0; i < 10; i++) E.at(i * 50, () => E.add({ x: P.x + rnd(-40, 40), y: P.y + rnd(-10, 40), vx: rnd(-25, 25), vy: rnd(-90, -30), shape: 'ember', size: rnd(3, 6), c: '#ff8a3a', c2: '#ffe27a', life: rnd(600, 1000), add: true }));
+    if (o.land !== 0) E.at(160, () => E.land(0.5));
+  });
+
+  def('aura', (o) => (o.dur || 800) + 240, (E, o) => {
+    const P = E.pt(o.on || 'A'), kind = o.kind || 'glow', dur = o.dur || 800, c = E.col(o.c);
+    if (kind === 'heal') { for (let k = 0; k < 4; k++) E.at(k * 170, () => E.burst('cross', P.x, P.y, { n: 6, s: 1, c: o.c || '#7dff9a' })); E.ring(P.x, P.y, c, 80, 520); E.at(260, () => E.ring(P.x, P.y, c, 100, 520)); }
+    else if (kind === 'shield') {
+      const R = E.cr * 0.62; E.add({ life: dur, z: 1, fade: 0, x: P.x, y: P.y, draw(ctx, p) { const u = p.age / dur, sc = lerp(0.6, 1, EZ.back(clamp(p.age / 260, 0, 1))), al = Math.min(1, p.age / 120) * (1 - clamp((p.age - (dur - 220)) / 220, 0, 1)), r = R * sc * (1 + 0.025 * Math.sin(p.age * 0.02)); ctx.translate(P.x, P.y); ctx.globalAlpha *= al; const g = ctx.createRadialGradient(0, 0, r * 0.4, 0, 0, r); g.addColorStop(0, rgba(c, 0.05)); g.addColorStop(0.8, rgba(c, 0.28)); g.addColorStop(1, rgba(c, 0.6)); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, r, 0, TAU); ctx.fill(); ctx.strokeStyle = rgba('#ffffff', 0.9); ctx.lineWidth = 4; ctx.stroke(); ctx.strokeStyle = rgba('#ffffff', 0.35); ctx.lineWidth = 2; ctx.beginPath(); for (let k = 0; k < 6; k++) { const a = (k / 6) * TAU + u * 0.8; ctx.lineTo(Math.cos(a) * r * 0.62, Math.sin(a) * r * 0.62); } ctx.closePath(); ctx.stroke(); ctx.strokeStyle = 'rgba(255,255,255,.9)'; ctx.lineWidth = 5; ctx.beginPath(); ctx.arc(0, 0, r * 0.84, Math.PI * 1.15, Math.PI * 1.45); ctx.stroke(); } });
+      E.at(dur - 120, () => { E.burst('glitter', P.x, P.y, { n: 12, s: 1, c: o.c }); E.ring(P.x, P.y, c, 90, 360); });
+    } else if (kind === 'charge') {
+      for (let i = 0; i < 22; i++) E.at(i * (dur / 30), () => { const a = rnd(0, TAU), r = rnd(110, 160) * E.sc; E.add({ life: 420, shape: 'orb', size: rnd(3, 6) * E.sc, c, add: true, fade: 0, x: P.x + Math.cos(a) * r, y: P.y + Math.sin(a) * r, upd(p) { const u = EZ.in(p.age / 420); p.x = P.x + Math.cos(a) * r * (1 - u); p.y = P.y + Math.sin(a) * r * (1 - u); } }); });
+      E.anim(dur, (u) => { E.pose.a.tint = 0.35 * (0.5 + 0.5 * Math.sin(u * 40)) * (u < 1 ? 1 : 0); }); E.add({ life: dur, z: 0, add: true, fade: 0, draw(ctx, p) { ctx.translate(P.x, P.y); glow(ctx, E.cr * (0.45 + 0.15 * Math.sin(p.age * 0.03)) * (0.6 + p.age / dur * 0.6), c, 0.75); } });
+      for (let i = 0; i < 4; i++) E.at(i * dur / 4, () => E.burst('zap', P.x, P.y, { n: 4, s: 0.5, c: o.c }));
+    } else if (kind === 'power') {
+      for (let i = 0; i < 18; i++) E.at(i * 35, () => E.add({ x: P.x + rnd(-E.cr * 0.45, E.cr * 0.45), y: P.y + E.cr * 0.4, vy: -rnd(260, 520), shape: 'streak', size: rnd(8, 16), c, rot: -Math.PI / 2, life: 480, add: true }));
+      E.ring(P.x, P.y + E.cr * 0.3, c, 90, 460);
+    } else { E.ring(P.x, P.y, c, 80, 480); E.at(200, () => E.ring(P.x, P.y, c, 110, 480)); E.burst('glitter', P.x, P.y, { n: 14, s: 1, c: o.c }); }
+    E.at(dur * 0.55, () => E.revealSelf());
+  });
+
+  def('drain', (o) => (o.dur || 760) + (o.n || 12) * 40 + 120, (E, o) => {
+    const n = o.n || 12, dur = o.dur || 760, c = E.col(o.c), shape = o.shape || 'orb', c2 = o.c2 ? E.col(o.c2) : null;
+    E.at(130, () => E.land(0.7));
+    for (let i = 0; i < n; i++) E.at(i * 40, () => {
+      const A = E.A, D = { x: E.D.x + rnd(-24, 24), y: E.D.y + rnd(-24, 24) }, off = rnd(-110, 110), mx = (A.x + D.x) / 2 - (D.y - A.y) / 6 * Math.sign(off) + off * 0.3, my = (A.y + D.y) / 2 + (D.x - A.x) / 6 * Math.sign(off) + off * 0.3;
+      E.add({ life: dur, shape, size: rnd(5, 8) * E.sc, c, c2, add: !!ADD[shape], fade: 0, x: D.x, y: D.y, rot: 0, upd(p, dt) { const u = EZ.io(clamp(p.age / dur, 0, 1)), a = 1 - u; p.x = a * a * D.x + 2 * a * u * mx + u * u * A.x; p.y = a * a * D.y + 2 * a * u * my + u * u * A.y; p.rot += dt * 0.008; if (Math.random() < 0.35) E.add({ x: p.x, y: p.y, shape: 'dot', size: 4, s1: 0.2, c, life: 260, add: true, a: 0.7, z: 0 }); } });
+      E.at(dur, () => { if (i % 3 === 0) E.burst('glitter', E.A.x + rnd(-14, 14), E.A.y + rnd(-14, 14), { n: 3, s: 0.5, c: o.c }); });
+    });
+    E.at(dur + n * 40, () => { E.ring(E.A.x, E.A.y, c, 70, 380); E.revealSelf(); });
+  });
+
+  def('field', (o) => (o.dur || 800) + 120, (E, o) => {
+    const k = o.kind, dur = o.dur || 800, W = E.W, H = E.H, c = E.col(o.c);
+    if (k === 'flash') E.flash(c, o.a == null ? 0.7 : o.a, dur);
+    else if (k === 'dark') E.tint(o.c ? c : '#0a0420', o.a == null ? 0.6 : o.a, 220, dur * 0.6, 320);
+    else if (k === 'streaks') for (let i = 0; i < (o.n || 30); i++) E.at((i / (o.n || 30)) * dur * 0.8, () => { const y = rnd(0, H); E.add({ x: W + 60, y, vx: -rnd(1100, 1700), vy: rnd(120, 260), shape: 'streak', size: rnd(10, 22), c: o.c ? c : '#e8faff', rot: Math.PI + 0.15, life: 560, add: true, fade: 1, hold: 0.8, z: 1 }); });
+    else if (k === 'rays') E.add({ life: dur, z: 0, add: true, fade: 0, draw(ctx, p) { const al = Math.sin(Math.PI * clamp(p.age / dur, 0, 1)); ctx.globalAlpha *= al * 0.55; const ox = o.ox == null ? W * 0.5 : o.ox; for (let r = 0; r < 9; r++) { const a = Math.PI / 2 + (r - 4) * 0.17 + Math.sin(p.age * 0.002 + r) * 0.03; ctx.fillStyle = rgba(o.c ? c : '#fff3b0', r % 2 ? 0.4 : 0.22); ctx.beginPath(); ctx.moveTo(ox, -30); ctx.lineTo(ox + Math.cos(a - 0.05) * H * 1.3, -30 + Math.sin(a - 0.05) * H * 1.3); ctx.lineTo(ox + Math.cos(a + 0.05) * H * 1.3, -30 + Math.sin(a + 0.05) * H * 1.3); ctx.closePath(); ctx.fill(); } } });
+    else if (k === 'aurora') E.add({ life: dur, z: 0, add: true, fade: 0, draw(ctx, p) { const al = Math.sin(Math.PI * clamp(p.age / dur, 0, 1)); ctx.globalAlpha *= al * 0.7; ['#7dffb0', '#7ad0ff', '#c79aff'].forEach((col, r) => { const g = ctx.createLinearGradient(0, 0, W, 0); g.addColorStop(0, rgba(col, 0)); g.addColorStop(0.5, rgba(col, 0.55)); g.addColorStop(1, rgba(col, 0)); ctx.strokeStyle = g; ctx.lineWidth = 46; ctx.lineCap = 'round'; ctx.beginPath(); for (let x = -20; x <= W + 20; x += 20) { const y = H * (0.2 + r * 0.1) + Math.sin(x * 0.011 + p.age * 0.0032 + r * 1.7) * 38; x === -20 ? ctx.moveTo(x, y) : ctx.lineTo(x, y); } ctx.stroke(); }); } });
+    else if (k === 'stars') for (let i = 0; i < (o.n || 22); i++) E.at(rnd(0, dur * 0.5), () => E.add({ x: rnd(10, W - 10), y: rnd(10, H - 10), shape: i % 3 ? 'star' : 'diamond', size: rnd(4, 11), c: i % 2 ? '#fff6c8' : '#e0c8ff', c2: '#c9a8ff', life: rnd(500, 900), vr: rnd(-3, 3), fin: 0.3, add: true }));
+    else if (k === 'embers') for (let i = 0; i < (o.n || 26); i++) E.at(rnd(0, dur * 0.7), () => E.add({ x: rnd(0, W), y: H + 10, vx: rnd(-30, 30), vy: -rnd(120, 300), shape: 'ember', size: rnd(3, 8), c: '#ff8a3a', c2: '#ffe27a', life: rnd(700, 1200), add: true }));
+    else if (k === 'snow') for (let i = 0; i < (o.n || 32); i++) E.at(rnd(0, dur * 0.7), () => E.add({ x: rnd(0, W), y: -10, vx: rnd(-40, 40), vy: rnd(120, 260), shape: 'snow', size: rnd(4, 9), c: '#f0fcff', life: rnd(800, 1200), vr: rnd(-3, 3) }));
+    else if (k === 'rain') for (let i = 0; i < (o.n || 44); i++) E.at(rnd(0, dur * 0.8), () => E.add({ x: rnd(0, W + 80), y: -20, vx: -140, vy: 900, shape: 'streak', size: rnd(7, 13), c: '#bfe4ff', rot: Math.atan2(900, -140), life: 520, add: true, fade: 1, hold: 0.8 }));
+    else if (k === 'leaves') for (let i = 0; i < (o.n || 24); i++) E.at(rnd(0, dur * 0.7), () => E.add({ x: -20, y: rnd(0, H), vx: rnd(300, 560), vy: rnd(-60, 60), ay: 40, shape: 'leaf', size: rnd(6, 12), c: i % 2 ? '#6fe07a' : '#a8ecaa', c2: '#2b8a46', life: rnd(900, 1300), rot: rnd(0, TAU), vr: rnd(-8, 8) }));
+    else if (k === 'vortex') E.add({ life: dur, z: 0, fade: 0, draw(ctx, p) { const u = p.age / dur, al = Math.sin(Math.PI * clamp(u, 0, 1)); ctx.globalAlpha *= al * 0.8; ctx.translate(E.D.x, E.D.y); ctx.lineWidth = 12; ctx.lineCap = 'round'; for (let a = 0; a < 3; a++) { ctx.strokeStyle = rgba(a % 2 ? '#7a4ae0' : '#1a0a3a', 0.8); ctx.beginPath(); for (let t = 0; t < 1; t += 0.04) { const ang = a * 2.09 + t * 7 + u * 6, r = 20 + t * 170; t ? ctx.lineTo(Math.cos(ang) * r, Math.sin(ang) * r * 0.7) : ctx.moveTo(Math.cos(ang) * r, Math.sin(ang) * r * 0.7); } ctx.stroke(); } } });
+  });
+
+  def('nova', (o) => (o.charge || 600) + 760, (E, o) => {
+    const P = E.pt(o.src || 'A'), ch = o.charge || 600, c = E.col(o.c), c2 = o.c2 ? E.col(o.c2) : '#ffffff', R = (o.r || 230) * E.sc;
+    for (let i = 0; i < 28; i++) E.at((i / 28) * ch * 0.8, () => { const a = rnd(0, TAU), r = rnd(120, 190) * E.sc, life = Math.max(260, ch * 0.5); E.add({ life, shape: 'orb', size: rnd(3, 6), c, add: true, fade: 0, x: P.x + Math.cos(a) * r, y: P.y + Math.sin(a) * r, upd(p) { const u = EZ.in(p.age / life); p.x = P.x + Math.cos(a + u * 1.6) * r * (1 - u); p.y = P.y + Math.sin(a + u * 1.6) * r * (1 - u); } }); });
+    E.add({ life: ch, z: 0, add: true, fade: 0, draw(ctx, p) { ctx.translate(P.x, P.y); const u = p.age / ch; glow(ctx, lerp(6, 62, EZ.in(u)) * E.sc + Math.sin(p.age * 0.05) * 3, c, 0.9); glow(ctx, lerp(3, 28, EZ.in(u)) * E.sc, c2, 0.9); } });
+    E.at(ch, () => {
+      const T = E.pt(o.to || 'D');
+      E.add({ life: 620, z: 1, add: true, fade: 0, draw(ctx, p) { const u = p.age / 620, r = R * EZ.out(u); ctx.translate(T.x, T.y); ctx.globalAlpha *= 1 - u * u; const g = ctx.createRadialGradient(0, 0, 0, 0, 0, r); g.addColorStop(0, rgba(c2, 1)); g.addColorStop(0.35, rgba(c, 0.85)); g.addColorStop(1, rgba(c, 0)); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, r, 0, TAU); ctx.fill(); } });
+      E.ring(T.x, T.y, c2, R * 0.8, 520); E.at(110, () => E.ring(T.x, T.y, c, R, 560)); E.burst('stars', T.x, T.y, { n: 16, s: 1.4, c: o.c }); E.flash(c, 0.55, 320); E.shake(o.shake || 14, 520); if (o.land !== 0) E.land(1.25);
+    });
+  });
+
+  def('shock', (o) => (o.dur || 600) + 120, (E, o) => {
+    const P = E.pt(o.on || 'D'), dur = o.dur || 600, c = E.col(o.c || 'gold');
+    for (let t = 0; t < dur; t += 45) E.at(t, () => {
+      const a = rnd(0, TAU), r0 = E.cr * rnd(0.18, 0.34), r1 = E.cr * rnd(0.46, 0.62), pts = jag(P.x + Math.cos(a) * r0, P.y + Math.sin(a) * r0, P.x + Math.cos(a + rnd(-0.5, 0.5)) * r1, P.y + Math.sin(a + rnd(-0.5, 0.5)) * r1, 9, 12, Math.random() * 9);
+      E.add({ life: 120, z: 1, add: true, fade: 0, draw(ctx) { ctx.lineCap = 'round'; ctx.strokeStyle = rgba(c, 0.6); ctx.lineWidth = 7; strokePts(ctx, pts); ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; strokePts(ctx, pts); } });
+    });
+    const k = o.on === 'A' ? 'a' : 'd'; E.anim(dur, (u) => { E.pose[k].tint = (Math.floor(u * dur / 70) % 2 ? 0.55 : 0.1) * (u < 1 ? 1 : 0); });
+    if (o.land !== 0) { E.at(90, () => E.land(0.6, true)); E.at(dur * 0.7, () => E.land(0.9)); }
+  });
+
+  def('wave', (o) => (o.dur || 760) + 120, (E, o) => {
+    const dur = o.dur || 760, W = E.W, D = E.D, c = E.col(o.c || 'water'), c2 = E.col(o.c2 || 'deep'), h = (o.h || 130) * E.sc, dir = E.D.x >= E.A.x ? 1 : -1, ground = E.gy(D) + 14;
+    E.add({
+      life: dur, z: 1, fade: 0,
+      draw(ctx, p) {
+        const u = p.age / dur, front = dir > 0 ? lerp(-W * 0.2, W * 1.2, EZ.io(u)) : lerp(W * 1.2, -W * 0.2, EZ.io(u)), span = W * 0.5; ctx.globalAlpha *= 0.92 * (1 - clamp((u - 0.8) / 0.2, 0, 1));
+        const topAt = (x) => { const t = clamp(dir > 0 ? (x - (front - span)) / span : ((front + span) - x) / span, 0, 1); return ground - h * Math.pow(t, 0.7) * (0.6 + 0.4 * Math.sin(t * Math.PI)) - 8 * Math.sin(x * 0.05 + p.age * 0.012); };
+        const g = ctx.createLinearGradient(0, ground - h, 0, ground); g.addColorStop(0, rgba(c, 0.85)); g.addColorStop(1, rgba(c2, 0.95)); ctx.fillStyle = g; ctx.beginPath(); const x0 = dir > 0 ? front - span : front, x1 = dir > 0 ? front : front + span; ctx.moveTo(x0, ground + 30);
+        for (let x = x0; x <= x1; x += 14) ctx.lineTo(x, topAt(x)); ctx.lineTo(x1, ground + 30); ctx.closePath(); ctx.fill();
+        ctx.fillStyle = 'rgba(255,255,255,.9)'; for (let x = x0; x <= x1; x += 26) { ctx.beginPath(); ctx.arc(x, topAt(x), 4 + 2 * Math.sin(x + p.age * 0.01), 0, TAU); ctx.fill(); }
+      }
+    });
+    E.at(dur * 0.4, () => { E.burst('bubbles', D.x, D.y, { n: 14, s: 1.2, c: o.c }); E.burst('drops', D.x, D.y - 20, { n: 10, s: 1, c: o.c }); E.shake(7, 360); if (o.land !== 0) E.land(1); });
+  });
+
+  /* pose: squash / sink / lift the critter for a moment (Hide, Dig, stomps) */
+  def('pose', (o) => (o.dur || 400) * 2 + (o.hold || 0) + 40, (E, o) => {
+    const p = E.pose[o.side || 'a'], dur = o.dur || 400, hold = o.hold || 0, tot = dur * 2 + hold;
+    E.anim(tot, (u) => { const t = u * tot, k = t < dur ? EZ.out(t / dur) : t < dur + hold ? 1 : 1 - EZ.in((t - dur - hold) / dur); p.sc = lerp(1, o.sc == null ? 1 : o.sc, k); p.dy = (o.dy || 0) * k; p.dx = (o.dx || 0) * k; p.rot = (o.rot || 0) * k; if (u >= 1) { p.sc = 1; p.dx = p.dy = p.rot = 0; } });
+  });
+
+  /* ============================================================
+     PART 3 — one recipe per attack (all 102). Format: R(name, comic word, sound, [ [primitive, options], ... ]).
+     Colours come from the attacker's type unless a step names its own. Damage scales sizes and shake.
+     ============================================================ */
+  const R = (name, word, sfx, steps) => { RECIPES[name] = { word, sfx, steps }; };
+
+  /* ---- Flame ---- */
+  R('Cinder Nip', 'NIP!', 'chomp', [['rush', { to: 0.8, dur: 500, land: 1, hit: 'fire', hn: 6, hs: 0.5 }], ['bite', { at: 190, kind: 'fang', s: 0.75, g: '#c4361c', land: 0 }]]);
+  R('Smolder', 'FWOOMP!', 'fire', [['proj', { shape: 'ember', n: 3, gap: 140, dur: 430, arc: 55, flip: 1, trail: 'smoke', size: 11, hit: 'fire', hn: 7, hs: 0.55, c: 'fire', c2: 'pale' }], ['cloud', { at: 520, kind: 'ash', n: 8, dur: 700, land: 0 }]]);
+  R('Scorch Claw', 'SCORCH!', 'slash', [['rush', { to: 0.82, dur: 540 }], ['slash', { at: 215, kind: 'claw', n: 3, c: 'flame', ang: -40 }], ['burst', { at: 240, k: 'fire', n: 12, s: 0.9 }]]);
+  R('Fire Spin', 'WHOOSH!', 'fire', [['swirl', { shape: 'ember', n: 40, r0: 120, r1: 24, turns: 3, dur: 950, rise: -40, c: 'fire', c2: 'pale', size: 10, rings: 1, shake: 5 }], ['field', { kind: 'embers', dur: 950 }], ['burst', { at: 900, k: 'fire', n: 22, s: 1.4 }]]);
+  R('Inferno Breath', 'ROARRR!', 'beam', [['beam', { style: 'wave', w: 32, dur: 950, c: 'fire', core: 'pale' }], ['field', { at: 150, kind: 'embers', dur: 900 }], ['burst', { at: 350, k: 'fire', n: 16, s: 1.2 }]]);
+  R('Dragon Blaze', 'BLAZE!!', 'fire', [['nova', { charge: 620, src: 'A', r: 280, c: 'fire', c2: 'pale', shake: 18 }], ['beam', { at: 640, style: 'wave', w: 50, dur: 800, c: 'flame', core: 'white', land: 0 }], ['field', { at: 640, kind: 'embers', dur: 900, n: 36 }], ['burst', { at: 700, k: 'fire', n: 28, s: 1.8 }]]);
+  R('Pounce', 'POUNCE!', 'attackWhoosh', [['rush', { to: 0.86, dur: 560, arc: 90, land: 1, hit: 'stars', hn: 5, hs: 0.6, hc: 'gold' }]]);
+  R('Cinder Fang', 'CHOMP!', 'chomp', [['rush', { to: 0.84, dur: 540 }], ['bite', { at: 210, kind: 'jaw', s: 1, g: '#c4361c' }], ['burst', { at: 230, k: 'fire', n: 10, s: 0.9 }]]);
+  R('Flame Fang', 'GRRR-CHOMP!', 'chomp', [['rush', { to: 0.85, dur: 520 }], ['bite', { at: 200, kind: 'fang', s: 1.3, g: '#ff6a2a' }], ['burst', { at: 220, k: 'fire', n: 16, s: 1.1 }], ['burst', { at: 230, k: 'ring', c: 'fire' }]]);
+  R('Hellhound Rush', 'RAMPAGE!', 'fire', [['aura', { kind: 'power', on: 'A', c: 'fire', dur: 380 }], ['rush', { at: 360, to: 0.95, dur: 600, land: 1, shake: 9, hit: 'fire', hn: 20, hs: 1.2 }], ['field', { at: 300, kind: 'embers', dur: 700, n: 22 }], ['burst', { at: 600, k: 'ring', c: 'fire', s: 1.4 }]]);
+  R('Ash Dust', 'POOF!', 'poof', [['burst', { on: 'A', k: 'smoke', n: 6, c: '#8a8088', s: 0.8 }], ['proj', { shape: 'dot', n: 7, gap: 45, dur: 440, spread: 34, rand: 1, size: 7, c: '#e0d0c0', trail: 'smoke', tc: '#8a8088' }], ['cloud', { at: 480, kind: 'ash', n: 7, dur: 600, land: 0 }]]);
+  R('Wingburn', 'FLAP-BURN!', 'fire', [['slash', { kind: 'arc', n: 2, gap: 100, c: 'flame', s: 1.25, ang: 20 }], ['proj', { shape: 'ember', n: 5, gap: 50, dur: 360, spread: 26, rand: 1, size: 9, c: 'fire', c2: 'pale' }], ['burst', { at: 380, k: 'fire', n: 12, s: 0.9 }]]);
+  R('Magma Fist', 'KA-POW!', 'rumble', [['rush', { to: 0.84, dur: 520, land: 1, shake: 8 }], ['burst', { at: 220, k: 'ring', c: 'fire' }], ['burst', { at: 220, k: 'fire', n: 14, s: 1.1 }], ['quake', { at: 230, amp: 7, dur: 360, cracks: 5, glow: 'fire', land: 0 }]]);
+  R('Eruption', 'ERUPT!', 'rumble', [['quake', { amp: 12, dur: 850, cracks: 8, glow: 'fire' }], ['burst', { at: 120, ground: 1, k: 'fire', n: 26, s: 1.6 }], ['rain', { at: 300, shape: 'rock', c: 'fire', c2: '#7a1c10', n: 10, gap: 55, area: 90, trail: 'ember', hit: 'fire', size: 12, land: 0 }], ['field', { at: 100, kind: 'embers', dur: 900, n: 30 }]]);
+
+  /* ---- Tide ---- */
+  R('Splash', 'SPLASH!', 'splash', [['proj', { shape: 'drop', n: 4, gap: 70, dur: 380, arc: 40, flip: 1, spread: 14, size: 9, hit: 'drops', hn: 5, hs: 0.5, c: 'water' }]]);
+  R('Water Gun', 'SQUIRT!', 'splash', [['beam', { style: 'plain', w: 11, dur: 560, c: 'water', core: 'white' }], ['burst', { at: 160, k: 'drops', n: 10, s: 0.8 }]]);
+  R('Tidal Slap', 'SLAP!', 'splash', [['rush', { to: 0.8, dur: 520, land: 1, hit: 'drops', hn: 10, hs: 0.9 }], ['slash', { at: 205, kind: 'arc', n: 1, c: 'water', ang: 60, s: 1.1, land: 0 }], ['burst', { at: 210, k: 'ring', c: 'water' }]]);
+  R('Whirlpool', 'SWIRL!', 'wind', [['swirl', { shape: 'bubble', n: 26, r0: 120, r1: 18, turns: 2.5, dur: 950, c: 'water', rings: 1, size: 9, shake: 3 }], ['swirl', { at: 120, shape: 'drop', n: 14, r0: 90, r1: 12, turns: 3, dur: 780, c: 'deep', size: 7, land: 0 }]]);
+  R('Riptide', 'RIPTIDE!', 'splash', [['wave', { h: 125, dur: 840 }], ['burst', { at: 520, k: 'bubbles', n: 12, s: 1 }]]);
+  R('Hydro Crush', 'CRUSH!!', 'rumble', [['field', { kind: 'dark', c: '#05204a', a: 0.5, dur: 900 }], ['swirl', { shape: 'bubble', n: 30, r0: 150, r1: 10, turns: 1.6, dur: 700, c: 'water', size: 12, rings: 1, land: 0 }], ['nova', { at: 150, src: 'D', charge: 560, r: 250, c: 'water', c2: 'white', shake: 16 }], ['rain', { at: 760, shape: 'drop', n: 10, gap: 40, area: 80, c: 'water', size: 10, hit: 'drops', land: 0 }]]);
+  R('Bubble Pop', 'POP!', 'poof', [['proj', { shape: 'bubble', n: 5, gap: 80, dur: 520, arc: 40, rand: 1, spread: 30, size: 11, hit: 'bubbles', hn: 5, hs: 0.6, c: 'water' }], ['aura', { at: 380, on: 'A', kind: 'heal', c: '#7dffd8', dur: 700 }]]);
+  R('Aqua Tail', 'SWOOSH!', 'splash', [['rush', { to: 0.8, dur: 560, spin: 360, land: 1 }], ['slash', { at: 215, kind: 'arc', n: 1, c: 'water', ang: -20, s: 1.35, land: 0 }], ['burst', { at: 230, k: 'drops', n: 12, s: 1 }]]);
+  R('Water Whip', 'WHIP!', 'slash', [['beam', { style: 'wave', w: 8, dur: 480, grow: 110, c: 'water', core: 'white' }], ['slash', { at: 130, kind: 'arc', n: 1, c: 'water', s: 1.1, ang: -50, land: 0 }], ['burst', { at: 150, k: 'drops', n: 8, s: 0.8 }]]);
+  R('Rapid Rush', 'RAPID!', 'attackWhoosh', [['rush', { to: 0.8, dur: 300, land: 1, hit: 'drops', hn: 5 }], ['rush', { at: 300, to: 0.8, dur: 300, land: 1, hit: 'drops', hn: 5 }], ['rush', { at: 600, to: 0.85, dur: 320, land: 1, hit: 'drops', hn: 7 }]]);
+  R('Shell Bash', 'BONK!', 'rumble', [['rush', { to: 0.82, dur: 620, spin: -720, land: 1, shake: 7 }], ['burst', { at: 250, k: 'ring', c: 'water' }], ['burst', { at: 250, k: 'stars', n: 8, s: 0.9, c: 'white' }]]);
+  R('Hide', 'HIDE!', 'poof', [['pose', { side: 'a', sc: 0.62, dy: 26, dur: 260, hold: 600 }], ['aura', { kind: 'shield', on: 'A', c: 'water', dur: 1000 }], ['burst', { on: 'A', k: 'bubbles', n: 8, s: 0.8 }]]);
+  R('Lantern Lure', 'GLOW…', 'shade', [['field', { kind: 'dark', c: '#031a3a', a: 0.45, dur: 1150 }], ['aura', { kind: 'glow', on: 'A', c: 'gold', dur: 500 }], ['proj', { at: 300, shape: 'orb', c: 'gold', size: 15, dur: 720, wobble: 34, trail: 'dot', hit: 'glitter', hn: 14, hs: 1 }], ['burst', { at: 1000, k: 'bubbles', n: 6, s: 0.8 }]]);
+  R('Crushing Depths', 'CRUSH!!!', 'rumble', [['field', { kind: 'dark', c: '#031a3a', a: 0.7, dur: 1250 }], ['swirl', { shape: 'bubble', n: 34, r0: 200, r1: 8, turns: 1.2, dur: 800, c: 'deep', size: 13, rings: 1, land: 0 }], ['nova', { at: 400, src: 'D', charge: 300, r: 250, c: 'deep', c2: 'water', shake: 17 }], ['burst', { at: 1050, k: 'bubbles', n: 14, s: 1.2 }]]);
+
+  /* ---- Leaf ---- */
+  R('Vine Poke', 'POKE!', 'leaf', [['beam', { style: 'plain', w: 6, dur: 460, grow: 130, c: 'leaf', core: 'lime' }], ['burst', { at: 140, k: 'leaves', n: 6, s: 0.7 }]]);
+  R('Leech Seed', 'SEED!', 'leaf', [['proj', { shape: 'seed', n: 3, gap: 110, dur: 420, arc: 50, flip: 1, size: 9, c: 'lime', hit: 'leaves', hn: 3 }], ['drain', { at: 650, shape: 'orb', c: 'lime', n: 10, dur: 600 }]]);
+  R('Razor Leaf', 'SLICE!', 'slash', [['proj', { shape: 'leaf', n: 6, gap: 60, dur: 360, spread: 34, spin: 14, size: 10, trail: 'spark', tc: 'leaf', c: 'leaf', hit: 'sparks', hn: 4, hc: 'lime' }]]);
+  R('Sleep Spore', 'ZZZ…', 'poof', [['proj', { shape: 'dot', n: 10, gap: 40, dur: 520, spread: 40, rand: 1, size: 6, c: '#fff6a0', trail: 'dot', tc: '#fff6a0' }], ['cloud', { at: 460, kind: 'spore', n: 10, dur: 700 }], ['cloud', { at: 640, kind: 'zzz', n: 4, dur: 700, land: 0 }]]);
+  R('Solar Burst', 'SOLAR!', 'beam', [['field', { kind: 'rays', c: '#fff3b0', dur: 900 }], ['beam', { at: 200, from: 'sky', style: 'pulse', w: 26, c: '#fff0a0', core: 'white', dur: 700 }], ['aura', { at: 650, on: 'A', kind: 'heal', c: '#a8ff8a', dur: 600 }], ['burst', { at: 400, k: 'glitter', n: 14, s: 1.1, c: '#fff3b0' }]]);
+  R('Overgrowth', 'OVERGROW!', 'leaf', [['field', { kind: 'leaves', dur: 1000 }], ['spikes', { at: 150, kind: 'thorn', n: 7, w: 150, h: 150 }], ['burst', { at: 250, ground: 1, k: 'leaves', n: 20, s: 1.3 }], ['aura', { at: 750, on: 'A', kind: 'heal', c: '#7dff9a', dur: 600 }]]);
+  R('Leaf Swipe', 'SWIPE!', 'slash', [['rush', { to: 0.72, dur: 420 }], ['slash', { at: 160, kind: 'arc', n: 1, c: 'leaf', ang: -30, s: 1.1 }], ['burst', { at: 180, k: 'leaves', n: 6, s: 0.7 }]]);
+  R('Quick Dash', 'ZOOM!', 'wind', [['field', { kind: 'streaks', c: 'lime', n: 16, dur: 450 }], ['rush', { to: 0.85, dur: 420, land: 1, hit: 'stars', hn: 6, hs: 0.6, hc: 'lime' }]]);
+  R('Bramble Bite', 'CHOMP!', 'chomp', [['spikes', { kind: 'thorn', n: 3, w: 60, h: 70 }], ['bite', { at: 120, kind: 'jaw', s: 0.95, g: '#2b8a46', land: 0 }], ['cloud', { at: 360, kind: 'gas', n: 6, dur: 500, land: 0 }]]);
+  R('Thorn Barrage', 'BARRAGE!', 'slash', [['proj', { shape: 'spike', n: 10, gap: 45, dur: 340, spread: 50, rand: 1, size: 10, c: 'leaf', c2: '#1f6a35', hit: 'leaves', hn: 2, hs: 0.4 }]]);
+  R('Sting', 'ZZT!', 'zap', [['proj', { shape: 'spike', n: 1, dur: 260, size: 9, c: '#e8e07a', c2: '#6a5a10', hit: 'sparks', hn: 6, hc: 'gold' }], ['cloud', { at: 280, kind: 'gas', n: 4, dur: 400, land: 0 }]]);
+  R('Pollen Burst', 'POLLEN!', 'poof', [['cloud', { on: 'A', kind: 'spore', n: 8, dur: 500, land: 0 }], ['proj', { at: 200, shape: 'dot', n: 14, gap: 28, dur: 420, spread: 44, rand: 1, size: 6, c: '#fff6a0' }], ['burst', { at: 640, k: 'petals', n: 10, s: 0.9 }], ['aura', { at: 600, on: 'A', kind: 'glow', c: 'gold', dur: 400 }]]);
+  R('Spore Puff', 'PUFF!', 'poof', [['proj', { shape: 'smoke', n: 3, gap: 100, dur: 400, spread: 16, size: 11, c: '#d8d0f0', hit: 'smoke', hn: 3, hc: '#d8d0f0' }], ['cloud', { at: 400, kind: 'spore', n: 6, dur: 600, land: 0 }]]);
+  R('Toxic Cloud', 'TOXIC!', 'poof', [['field', { kind: 'dark', c: '#2a0a44', a: 0.3, dur: 1000 }], ['cloud', { kind: 'gas', n: 20, dur: 1100 }]]);
+  R('Root Slam', 'SLAM!', 'rumble', [['spikes', { kind: 'thorn', c: '#8a6238', c2: '#3a2412', n: 4, w: 70, h: 120 }], ['quake', { at: 60, amp: 8, dur: 450, cracks: 4, land: 0 }], ['burst', { at: 80, ground: 1, k: 'leaves', n: 8, s: 0.9 }]]);
+  R('World Tree Wrath', 'WRATH!!', 'leaf', [['field', { kind: 'rays', c: '#b8ff9a', dur: 1100 }], ['spikes', { at: 200, kind: 'thorn', n: 9, w: 180, h: 180 }], ['swirl', { at: 250, shape: 'leaf', n: 26, r0: 130, r1: 20, turns: 2, dur: 800, c: 'leaf', size: 10, land: 0 }], ['aura', { at: 850, on: 'A', kind: 'heal', c: '#7dff9a', dur: 600 }]]);
+
+  /* ---- Volt ---- */
+  R('Static', 'ZAP!', 'zap', [['proj', { shape: 'bolt', n: 3, gap: 70, dur: 300, spread: 18, size: 11, c: 'gold', trail: 'spark', hit: 'zap', hn: 5, hs: 0.6 }]]);
+  R('Spark', 'ZZZAP!', 'zap', [['beam', { style: 'zig', w: 8, dur: 500, grow: 110, c: 'gold', core: 'white' }], ['shock', { at: 150, dur: 500 }]]);
+  R('Thunder Shock', 'THUNDER!', 'zap', [['bolt', { n: 2, from: 'sky', gap: 150, w: 5 }], ['shock', { at: 120, dur: 650 }]]);
+  R('Charge Beam', 'CHARGE!', 'charge', [['aura', { kind: 'charge', on: 'A', c: 'gold', dur: 620 }], ['beam', { at: 580, style: 'twist', w: 18, dur: 700, c: 'gold', core: 'white' }]]);
+  R('Thunderbolt', 'BOOM!', 'zap', [['field', { kind: 'dark', a: 0.45, dur: 800 }], ['bolt', { n: 4, from: 'sky', gap: 100, w: 6 }], ['field', { at: 80, kind: 'flash', c: '#fff8c0', a: 0.5, dur: 220 }]]);
+  R('Tempest Strike', 'TEMPEST!!', 'zap', [['field', { kind: 'rain', dur: 1300 }], ['field', { kind: 'dark', c: '#08102e', a: 0.55, dur: 1300 }], ['bolt', { at: 150, n: 7, from: 'sky', gap: 120, w: 7 }], ['shock', { at: 400, dur: 800 }]]);
+  R('Claw', 'SCRATCH!', 'slash', [['rush', { to: 0.8, dur: 460 }], ['slash', { at: 190, kind: 'claw', n: 3, c: 'gold', ang: -35, s: 0.85 }]]);
+  R('Spark Pounce', 'ZAP-POUNCE!', 'zap', [['rush', { to: 0.86, arc: 80, dur: 560, land: 1, hit: 'zap', hn: 10 }], ['shock', { at: 230, dur: 380, land: 0 }]]);
+  R('Arc Slash', 'ARC!', 'slash', [['rush', { to: 0.7, dur: 420 }], ['slash', { at: 170, kind: 'arc', n: 1, c: 'gold', s: 1.55, w: 16, ang: -45 }], ['burst', { at: 190, k: 'zap', n: 8, s: 0.9 }]]);
+  R('Lightning Rush', 'LIGHTNING!', 'zap', [['field', { kind: 'streaks', c: 'gold', n: 22, dur: 500 }], ['rush', { to: 0.95, dur: 430, land: 1, shake: 10, hit: 'zap', hn: 12, hs: 1 }], ['bolt', { at: 170, n: 2, from: 'A', gap: 100, w: 5, land: 0 }], ['burst', { at: 190, k: 'ring', c: 'gold', s: 1.3 }]]);
+  R('Zip', 'ZIP!', 'wind', [['field', { kind: 'streaks', c: 'gold', n: 12, dur: 350 }], ['proj', { shape: 'bolt', n: 1, dur: 230, size: 13, c: 'gold', trail: 'spark', hit: 'zap', hn: 5, hs: 0.6 }]]);
+  R('Bolt Sting', 'BZZT!', 'zap', [['proj', { shape: 'spike', n: 2, gap: 100, dur: 280, size: 11, c: 'gold', c2: '#8a6a10', hit: 'sparks', hn: 6, hc: 'gold' }], ['shock', { at: 300, dur: 450, land: 0 }]]);
+  R('Gale Wing', 'WHOOSH!', 'wind', [['swirl', { shape: 'streak', wind: 1, n: 22, r0: 130, r1: 30, dur: 800, c: '#e8f6ff', turns: 2, size: 12 }], ['field', { kind: 'streaks', n: 20, dur: 700, c: '#d8f0ff' }], ['slash', { at: 300, kind: 'arc', n: 1, c: 'white', s: 1.3, land: 0 }]]);
+  R('Skybolt', 'SKYBOLT!', 'zap', [['bolt', { n: 2, from: 'sky', gap: 160, w: 8 }], ['beam', { at: 260, from: 'sky', style: 'zig', w: 14, dur: 500, c: 'gold', core: 'white', land: 0 }], ['field', { at: 100, kind: 'flash', c: '#fff8c0', a: 0.5, dur: 240 }]]);
+
+  /* ---- Frost ---- */
+  R('Peck', 'PECK!', 'slash', [['rush', { to: 0.82, dur: 440, land: 1, hit: 'snow', hn: 6, hs: 0.6 }], ['burst', { at: 190, k: 'sparks', n: 5, s: 0.6, c: 'ice' }]]);
+  R('Snow Flurry', 'FLURRY!', 'frost', [['field', { kind: 'snow', n: 30, dur: 900 }], ['proj', { shape: 'snow', n: 8, gap: 50, dur: 420, spread: 30, rand: 1, size: 8, c: 'frost', spin: 6, hit: 'snow', hn: 2 }]]);
+  R('Ice Dive', 'DIVE!', 'frost', [['rush', { to: 0.9, arc: 110, dur: 580, land: 1, hit: 'shatter', hn: 12, hs: 1 }], ['burst', { at: 230, k: 'snow', n: 10, s: 1 }]]);
+  R('Blizzard Wing', 'BLIZZARD!', 'wind', [['field', { kind: 'streaks', n: 34, dur: 900 }], ['swirl', { shape: 'snow', n: 30, r0: 140, r1: 24, turns: 2.5, dur: 900, c: 'frost', size: 9, spin: 4 }], ['field', { kind: 'flash', c: '#d4f6ff', a: 0.35, dur: 600 }]]);
+  R('Aurora Beam', 'AURORA!', 'beam', [['field', { kind: 'aurora', dur: 1150 }], ['beam', { at: 200, style: 'wave', w: 22, c: '#7dffe0', core: 'white', dur: 800 }], ['burst', { at: 500, k: 'glitter', n: 14, s: 1.1, c: '#c8fff0' }]]);
+  R('Glacial Crash', 'GLACIAL!!', 'frost', [['field', { kind: 'snow', n: 36, dur: 1100 }], ['rain', { at: 150, shape: 'diamond', c: 'ice', c2: '#4aa3d6', n: 12, gap: 50, size: 24, area: 70, trail: 'snow', hit: 'shatter', hn: 7, hs: 0.9 }], ['quake', { at: 700, amp: 14, dur: 600, cracks: 6, land: 0 }], ['burst', { at: 700, ground: 1, k: 'shatter', n: 24, s: 1.5 }]]);
+  R('Frost Bite', 'NIP!', 'chomp', [['bite', { kind: 'fang', s: 0.85, c: 'frost', g: '#4aa3d6' }], ['burst', { at: 190, k: 'snow', n: 7, s: 0.8 }]]);
+  R('Icy Claw', 'SHING!', 'slash', [['rush', { to: 0.78, dur: 480 }], ['slash', { at: 185, kind: 'claw', n: 3, c: 'ice', ang: -40 }], ['burst', { at: 200, k: 'shatter', n: 8, s: 0.8 }]]);
+  R('Ice Pick', 'PICK!', 'frost', [['proj', { shape: 'diamond', n: 1, size: 22, dur: 280, c: 'ice', c2: '#4aa3d6', trail: 'snow', hit: 'shatter', hn: 10, hs: 0.9 }], ['burst', { on: 'A', k: 'snow', n: 6, s: 0.6 }]]);
+  R('Avalanche', 'AVALANCHE!', 'rumble', [['field', { kind: 'snow', n: 34, dur: 1200 }], ['rain', { shape: 'rock', c: '#f2fcff', c2: '#9ac8e0', n: 14, gap: 45, area: 100, size: 18, slant: 50, hit: 'snow', hn: 6 }], ['quake', { at: 300, amp: 10, dur: 700, cracks: 4, land: 0 }]]);
+  R('Chill Screech', 'SCREEE!', 'frost', [['proj', { shape: 'ring', n: 3, gap: 150, dur: 420, size: 16, c: 'frost', hit: 'snow', hn: 3 }], ['burst', { on: 'A', k: 'ring', c: 'frost', s: 1.4 }]]);
+  R('Frost Fang', 'CHOMP!', 'chomp', [['rush', { to: 0.8, dur: 520 }], ['bite', { at: 200, kind: 'jaw', c: 'frost', g: '#4aa3d6' }], ['burst', { at: 220, k: 'snow', n: 10, s: 0.9 }]]);
+  R('Frozen Gaze', 'FREEZE!', 'frost', [['beam', { style: 'pulse', w: 13, c: 'ice', core: 'white', dur: 700 }], ['spikes', { at: 500, kind: 'ice', n: 4, w: 70, h: 80, land: 0 }], ['field', { at: 400, kind: 'flash', c: '#bfeaff', a: 0.4, dur: 300 }]]);
+  R('Permafrost Crush', 'CRUSH!!', 'frost', [['field', { kind: 'dark', c: '#0a2a4a', a: 0.45, dur: 1000 }], ['spikes', { at: 120, kind: 'ice', n: 8, w: 160, h: 150 }], ['quake', { at: 400, amp: 12, dur: 600, cracks: 6, land: 0 }], ['burst', { at: 420, ground: 1, k: 'shatter', n: 24, s: 1.4 }]]);
+
+  /* ---- Stone ---- */
+  R('Rock Toss', 'TOSS!', 'rumble', [['proj', { shape: 'rock', n: 1, dur: 420, arc: 90, size: 13, c: 'stone', c2: 'rock', spin: 10, hit: 'dust', hn: 8 }]]);
+  R('Tumble', 'TUMBLE!', 'rumble', [['rush', { to: 0.85, spin: 720, dur: 620, land: 1, hit: 'dust', hn: 10 }], ['quake', { at: 260, amp: 5, dur: 260, cracks: 3, land: 0 }]]);
+  R('Horn Ram', 'RAM!', 'rumble', [['rush', { to: 0.9, dur: 480, shake: 8, land: 1, hit: 'dust', hn: 14 }], ['burst', { at: 195, k: 'ring', c: 'stone' }]]);
+  R('Rockslide', 'ROCKSLIDE!', 'rumble', [['rain', { shape: 'rock', n: 12, gap: 55, area: 100, size: 15, c: 'stone', c2: 'rock', slant: 60, hit: 'dust' }], ['quake', { at: 300, amp: 9, dur: 600, cracks: 3, land: 0 }]]);
+  R('Quake', 'QUAKE!', 'rumble', [['quake', { amp: 13, dur: 900, cracks: 8 }], ['burst', { at: 350, ground: 1, k: 'dust', n: 14, s: 1.2 }], ['burst', { at: 600, ground: 1, k: 'dust', n: 14, s: 1.4 }]]);
+  R('Titan Slam', 'TITAN SLAM!!', 'rumble', [['field', { kind: 'dark', a: 0.4, dur: 950 }], ['rain', { at: 250, shape: 'rock', n: 1, size: 60, dur: 420, area: 0, c: 'stone', c2: 'rock', hit: 'dust', hn: 22, hs: 1.6 }], ['quake', { at: 650, amp: 18, dur: 700, cracks: 10, land: 0 }], ['burst', { at: 660, ground: 1, k: 'ring', c: 'stone', s: 1.6 }]]);
+  R('Dig', 'DIG!', 'rumble', [['burst', { on: 'A', ground: 1, k: 'dust', n: 10, s: 1 }], ['pose', { side: 'a', sc: 0.55, dy: 58, dur: 280, hold: 450 }], ['aura', { at: 300, kind: 'shield', on: 'A', c: 'stone', dur: 900 }], ['burst', { at: 700, on: 'A', ground: 1, k: 'dust', n: 10, s: 1 }]]);
+  R('Mud Slap', 'SPLAT!', 'splash', [['proj', { shape: 'blob', n: 3, gap: 90, dur: 380, arc: 40, flip: 1, size: 11, c: 'mud', hit: 'mud', hn: 8 }]]);
+  R('Claw Crush', 'CRUSH!', 'slash', [['rush', { to: 0.82, dur: 520 }], ['slash', { at: 205, kind: 'claw', n: 3, c: 'stone', s: 1.1, w: 14 }], ['burst', { at: 220, k: 'dust', n: 8, s: 0.9 }]]);
+  R('Boulder Toss', 'BOULDER!', 'rumble', [['proj', { shape: 'rock', size: 32, arc: 140, dur: 640, spin: 5, c: 'stone', c2: 'rock', hit: 'dust', hn: 18, hs: 1.3 }], ['quake', { at: 640, amp: 9, dur: 350, cracks: 4, land: 0 }]]);
+  R('Shard Shot', 'PING!', 'frost', [['proj', { shape: 'diamond', n: 5, gap: 60, dur: 340, spread: 28, c: '#ffd0ee', c2: '#7a52e0', size: 11, trail: 'spark', hit: 'shatter', hn: 5, hs: 0.5 }]]);
+  R('Crystal Spike', 'CRYSTAL!', 'frost', [['spikes', { kind: 'crystal', n: 4, w: 90, h: 120 }], ['burst', { at: 150, k: 'glitter', n: 14, s: 1.1, c: '#ffd0ee' }], ['field', { at: 120, kind: 'flash', c: '#e8d0ff', a: 0.3, dur: 200 }]]);
+  R('Seismic Stomp', 'STOMP!', 'rumble', [['pose', { side: 'a', dy: -30, sc: 1.15, dur: 220, hold: 0 }], ['quake', { at: 230, amp: 11, dur: 700, cracks: 7 }], ['rain', { at: 260, shape: 'rock', n: 6, gap: 60, size: 10, c: 'stone', c2: 'rock', hit: 'dust', hn: 3, land: 0 }], ['burst', { at: 240, ground: 1, k: 'ring', c: 'stone' }]]);
+  R('Mountain Crush', 'CRUSH!!', 'rumble', [['field', { kind: 'dark', a: 0.45, dur: 1100 }], ['rain', { at: 200, shape: 'rock', n: 2, gap: 260, size: 46, area: 30, dur: 440, c: 'stone', c2: 'rock', hit: 'dust', hn: 18, hs: 1.4 }], ['quake', { at: 650, amp: 16, dur: 700, cracks: 9, land: 0 }]]);
+
+  /* ---- Shade ---- */
+  R('Nibble', 'NIBBLE!', 'chomp', [['bite', { kind: 'fang', s: 0.7, g: '#46288a' }], ['burst', { at: 190, k: 'ink', n: 5, s: 0.6 }]]);
+  R('Spook', 'BOO!', 'shade', [['field', { kind: 'dark', a: 0.5, dur: 800 }], ['proj', { shape: 'wisp', c: 'shade', n: 3, gap: 120, wobble: 30, dur: 520, size: 12, trail: 'smoke', tc: '#46288a', hit: 'ink', hn: 4 }], ['field', { at: 600, kind: 'flash', c: '#ffffff', a: 0.5, dur: 200 }]]);
+  R('Shadow Claw', 'SLASH!', 'slash', [['rush', { to: 0.8, dur: 500 }], ['slash', { at: 200, kind: 'claw', n: 3, c: 'shade', ang: -40 }], ['burst', { at: 215, k: 'ink', n: 6, s: 0.8 }]]);
+  R('Night Haunt', 'HAUNT…', 'shade', [['field', { kind: 'dark', a: 0.6, dur: 1100 }], ['swirl', { shape: 'wisp', wind: 1, n: 16, r0: 140, r1: 20, turns: 2, dur: 900, c: 'shade', size: 11 }], ['cloud', { at: 400, kind: 'ink', n: 10, dur: 800, land: 0 }]]);
+  R('Soul Drain', 'DRAIN!', 'shade', [['field', { kind: 'dark', a: 0.4, dur: 1200 }], ['burst', { at: 100, k: 'ink', n: 6, s: 0.9 }], ['drain', { at: 120, shape: 'wisp', c: 'shade', n: 16, dur: 800 }]]);
+  R('Dread Howl', 'HOWWWL!!', 'shade', [['field', { kind: 'vortex', dur: 1100 }], ['field', { kind: 'dark', a: 0.6, dur: 1100 }], ['burst', { on: 'A', k: 'ring', c: 'shade', s: 1.9 }], ['burst', { at: 160, on: 'A', k: 'ring', c: 'shade', s: 1.9 }], ['burst', { at: 320, on: 'A', k: 'ring', c: 'shade', s: 1.9 }], ['proj', { at: 160, shape: 'ring', n: 3, gap: 150, dur: 480, size: 20, c: 'shade', hit: 'ink', hn: 6, hs: 1 }]]);
+  R('Scratch', 'SCRATCH!', 'slash', [['rush', { to: 0.75, dur: 420 }], ['slash', { at: 165, kind: 'claw', n: 3, c: 'shade', ang: -35, s: 0.85 }]]);
+  R('Shadow Pounce', 'POUNCE!', 'attackWhoosh', [['burst', { on: 'A', k: 'ink', n: 6, s: 0.9 }], ['rush', { to: 0.86, arc: 70, dur: 540, land: 1 }], ['slash', { at: 230, kind: 'arc', n: 1, c: 'shade', ang: -30, s: 1.2, land: 0 }]]);
+  R('Void Pounce', 'VOID!', 'shade', [['field', { kind: 'vortex', dur: 700 }], ['rush', { to: 0.9, arc: 60, dur: 560, land: 1, hit: 'ink', hn: 12, hs: 1.2 }], ['field', { at: 230, kind: 'flash', c: '#2a1a45', a: 0.55, dur: 300 }]]);
+  R('Dark Rend', 'REND!', 'slash', [['field', { kind: 'dark', a: 0.35, dur: 800 }], ['slash', { kind: 'cross', c: '#7a4ae0', s: 1.4, w: 16 }], ['slash', { at: 280, kind: 'rake', n: 4, c: 'shade', ang: 30, land: 0 }], ['cloud', { at: 450, kind: 'gas', n: 6, dur: 500, land: 0 }]]);
+  R('Hex Stare', 'HEX!', 'shade', [['beam', { style: 'pulse', w: 9, c: 'shade', core: 'white', dur: 650 }], ['aura', { at: 300, on: 'D', kind: 'glow', c: '#ff7ac8', dur: 400 }]]);
+  R('Night Wing', 'FWAP!', 'wind', [['field', { kind: 'dark', a: 0.4, dur: 800 }], ['slash', { kind: 'arc', n: 2, gap: 90, c: '#6a3ad0', s: 1.4, ang: -20 }], ['burst', { at: 200, k: 'ink', n: 8, s: 0.9 }]]);
+  R('Shade Slip', 'SLIP!', 'shade', [['burst', { on: 'A', k: 'ink', n: 8, s: 1 }], ['swirl', { on: 'A', shape: 'wisp', wind: 1, n: 10, r0: 70, r1: 10, turns: 1.5, dur: 420, c: 'shade', size: 9, land: 0 }], ['rush', { at: 260, to: 1.05, dur: 480, land: 1, hit: 'ink', hn: 8 }]]);
+  R('Soul Siphon', 'SIPHON!', 'shade', [['field', { kind: 'dark', a: 0.45, dur: 1300 }], ['beam', { style: 'twist', w: 15, c: 'shade', core: 'white', dur: 700 }], ['drain', { at: 450, shape: 'wisp', c: 'shade', n: 14, dur: 700, land: 0 }]]);
+
+  /* ---- Cosmic ---- */
+  R('Star Shard', 'STAR!', 'cosmic', [['field', { kind: 'stars', dur: 900 }], ['proj', { shape: 'star', n: 7, gap: 55, dur: 400, spread: 34, spin: 10, size: 13, c: 'star', trail: 'spark', hit: 'stars', hn: 6, hs: 0.8 }]]);
+  R('Nova Collapse', 'NOVA!!!', 'cosmic', [['field', { kind: 'stars', n: 34, dur: 1500 }], ['nova', { src: 'A', charge: 720, r: 310, c: 'pink', c2: 'white', shake: 20 }], ['field', { at: 760, kind: 'flash', c: '#ffffff', a: 0.8, dur: 500 }], ['burst', { at: 780, k: 'glitter', n: 30, s: 1.8, c: '#ffd0ee' }]]);
+
+  const FALLBACK = (type) => ({ word: 'POW!', sfx: 'attackWhoosh', steps: [['proj', { shape: 'orb', n: 3, gap: 80, dur: 380, spread: 16, size: 12, c: 'glow', trail: 'dot', hit: 'stars', hn: 6 }]] });
+
+  /* ============================================================
+     PUBLIC API
+     ============================================================ */
+  function attack(o) {
+    if (live) live.abort();
+    const rec = RECIPES[o.atk.n] || FALLBACK(o.type);
+    const sc = clamp(0.78 + (o.atk.d || 0) / 135, 0.78, 1.5);
+    live = createStage(Object.assign({}, o, { recipe: rec, sc, type: o.A.card.t }));
+    return live.promise;
+  }
+  function abort() { if (live) live.abort(); }
+
+  CD.FX = { mode, attack, abort, createStage, PR, RECIPES, COLS, SH };
 })(globalThis);
 
 /* ===== battle.js ===== */
@@ -3945,10 +4771,54 @@ ${line.length > 1 ? `<div class="evo">${line.map((x) => `<button class="${x.id =
     return wait(1250);
   }
 
+  /* ---- attack cinematic: capture the board before the engine changes it, then build the stage info from the events ---- */
+  function fxCapture(who, atk) {
+    const opp = 1 - who, P = B.s.pl[who], O = B.s.pl[opp];
+    if (!P.active || !O.active) return null;
+    const ea = slotEl(who, -1), ed = slotEl(opp, -1);
+    if (!ea || !ed) return null;
+    const side = (p, sl, el) => {
+      const card = BY[sl.cid], pos = fxPos(el);
+      return { card, sprite: UI.bareURI(sl.cid), type: card.t, max: card.hp, hp0: E.left(sl), hp1: E.left(sl), from: pos, slotEl: el };
+    };
+    return { who, opp, atk, A: side(who, P.active, ea), D: side(opp, O.active, ed) };
+  }
+  function fxInfo(pre, evs) {
+    const inf = { dmg: 0, weak: false, miss: false, ko: false, status: [], tagsA: [], tagsD: [], healA: 0, recoil: 0 };
+    const k = pre.atk.fx && pre.atk.fx.k;
+    evs.forEach((e) => {
+      if (e.t === 'damage' && e.p === pre.opp && e.ref === -1 && !e.src && !e.snipe && !e.spread && !inf.dmg) { inf.dmg = e.n; inf.weak = !!e.weak; e.fxShown = true; }
+      else if (e.t === 'damage' && e.p === pre.who && e.ref === -1 && (e.recoil || e.thorns)) { inf.recoil += e.n; e.fxShown = true; }
+      else if (e.t === 'status' && e.p === pre.opp && e.ref === -1) { inf.status.push(e.st); e.fxShown = true; }
+      else if (e.t === 'heal' && e.p === pre.who && e.ref === -1) { inf.healA += e.n; e.fxShown = true; }
+      else if (e.t === 'ko' && e.p === pre.opp && e.ref === -1) inf.ko = true;
+    });
+    if (!inf.dmg && (k === 'flip0' || k === 'flipx')) inf.miss = true;
+    if (k === 'shield') inf.tagsA.push('Shield up!');
+    if (k === 'draw') inf.tagsA.push('Drew cards');
+    if (k === 'charge') inf.tagsA.push('Energy to bench');
+    if (k === 'gust' && !inf.ko && evs.some((e) => e.t === 'swap' && e.p === pre.opp)) inf.tagsD.push('Pushed out!');
+    pre.A.hp1 = Math.max(0, pre.A.hp0 - inf.recoil + inf.healA);
+    pre.D.hp1 = Math.max(0, pre.D.hp0 - inf.dmg);
+    return inf;
+  }
+  async function runFx(pre, evs) {
+    const info = fxInfo(pre, evs);
+    const bt = $('#bt');
+    if (!bt) return;
+    AU.sfx('attackWhoosh');
+    try {
+      await CD.FX.attack({ host: bt, A: pre.A, D: pre.D, atk: pre.atk, info, mode: CD.FX.mode() === 1 ? 'quick' : 'full', speed: B.speed });
+    } catch (err) { /* never let an effect bug block the game */ }
+  }
+
   async function playEvents(evs, action, who) {
     const names = ['You', B.e.t.n];
-    let lastTurn = null, sawOver = null;
+    let lastTurn = null, sawOver = null, fxPending = !!B.fxPre;
+    const fxRun = async () => { fxPending = false; const pre = B.fxPre; if (pre) await runFx(pre, evs); };
     for (const e of evs) {
+      if (fxPending && !['attack', 'coin', 'log', 'draw'].includes(e.t)) await fxRun();
+      if (!B || B.over && B.s.phase !== 'over') return;
       switch (e.t) {
         case 'draw': if (e.p === ME) AU.sfx('draw'); break;
         case 'coin': await coin(e.h); break;
@@ -3973,6 +4843,7 @@ ${line.length > 1 ? `<div class="evo">${line.map((x) => `<button class="${x.id =
         case 'promote': AU.sfx('promote'); B.pops.push(e.p + ':-1'); say(`${names[e.p]} sent out ${BY[E.slotAt(B.s.pl[e.p], -1).cid].n}.`); break;
         case 'attack': say(`${BY[e.cid].n} used ${e.name}!`); break;
         case 'damage': {
+          if (e.fxShown) { say(`${names[e.p]}'s critter took ${e.n} damage${e.weak ? ' (weakness!)' : ''}.`); break; }
           const el = slotEl(e.p, e.ref);
           const big = e.n >= 70;
           AU.sfx(e.weak ? 'crit' : 'hit');
@@ -3988,8 +4859,8 @@ ${line.length > 1 ? `<div class="evo">${line.map((x) => `<button class="${x.id =
           say(`${names[e.p]}'s critter took ${e.n} damage${e.weak ? ' (weakness!)' : ''}.`);
           await wait(e.src ? 420 : 520); break;
         }
-        case 'heal': { AU.sfx('heal'); floatText(slotEl(e.p, e.ref), '+' + e.n, 'heal'); await wait(380); break; }
-        case 'status': { AU.sfx('status'); floatText(slotEl(e.p, e.ref), { poison: 'Poisoned!', burn: 'Burned!', sleep: 'Asleep!', para: 'Paralyzed!' }[e.st], 'tag'); say(`${names[e.p]}'s Active critter is ${{ poison: 'poisoned', burn: 'burned', sleep: 'asleep', para: 'paralyzed' }[e.st]}.`); await wait(420); break; }
+        case 'heal': { if (e.fxShown) break; AU.sfx('heal'); floatText(slotEl(e.p, e.ref), '+' + e.n, 'heal'); await wait(380); break; }
+        case 'status': { if (e.fxShown) { say(`${names[e.p]}'s Active critter is ${{ poison: 'poisoned', burn: 'burned', sleep: 'asleep', para: 'paralyzed' }[e.st]}.`); break; } AU.sfx('status'); floatText(slotEl(e.p, e.ref), { poison: 'Poisoned!', burn: 'Burned!', sleep: 'Asleep!', para: 'Paralyzed!' }[e.st], 'tag'); say(`${names[e.p]}'s Active critter is ${{ poison: 'poisoned', burn: 'burned', sleep: 'asleep', para: 'paralyzed' }[e.st]}.`); await wait(420); break; }
         case 'statusEnd': floatText(slotEl(e.p, -1), 'Recovered', 'heal'); break;
         case 'discardEnergy': break;
         case 'ko': {
@@ -4005,6 +4876,7 @@ ${line.length > 1 ? `<div class="evo">${line.map((x) => `<button class="${x.id =
         default: break;
       }
     }
+    if (fxPending) await fxRun();
     render();
     if (lastTurn && !sawOver && B.s.phase !== 'setup') {
       AU.sfx('turn');
@@ -4019,18 +4891,24 @@ ${line.length > 1 ? `<div class="evo">${line.map((x) => `<button class="${x.id =
     const who = E.who(B.s);
     const tutHit = who === ME && tutMatches(a);
     clearSel(true);
+    let pre = null;
     if (a.a === 'attack') {
       const el = slotEl(who, -1);
       const atk = BY[B.s.pl[who].active.cid].atk[a.i];
-      AU.sfx('attackWhoosh');
-      if (el) el.classList.add(who === ME ? 'lunge-up' : 'lunge-down');
-      await banner(`${BY[B.s.pl[who].active.cid].n} used ${atk.n}!`, who === ME ? 'me' : 'opp', 820);
-      if (el) el.classList.remove('lunge-up', 'lunge-down');
+      if (CD.FX && CD.FX.mode() > 0 && $('#bt') && root.document.visibilityState !== 'hidden') pre = fxCapture(who, atk);
+      if (!pre) {
+        AU.sfx('attackWhoosh');
+        if (el) el.classList.add(who === ME ? 'lunge-up' : 'lunge-down');
+        await banner(`${BY[B.s.pl[who].active.cid].n} used ${atk.n}!`, who === ME ? 'me' : 'opp', 820);
+        if (el) el.classList.remove('lunge-up', 'lunge-down');
+      }
     }
     const res = E.apply(B.s, a);
     if (!res.ok) { B.busy = false; UI.toast('That is not allowed right now.'); AU.sfx('deny'); render(); return false; }
     const evs = E.drain(B.s);
+    B.fxPre = pre;
     await playEvents(evs, a, who);
+    B.fxPre = null;
     B.busy = false;
     if (tutHit) tutAdvance();
     next();
@@ -4467,7 +5345,7 @@ ${mine && ref >= 0 ? `<button class="btn ${canRet ? '' : 'ghost'}" ${canRet ? `d
   CD.Battle = { ACT, layout, _finish: () => finish(), get state() { return B; }, _render: render };
   if (typeof module !== 'undefined') module.exports = CD.Battle;
 
-  UI.SCREENS.battle = { enter() { /* built by startDuel */ }, leave() { if (B) { B.over = true; clearTimeout(B.aiT); } const c = $('#coach'); if (c) c.remove(); } };
+  UI.SCREENS.battle = { enter() { /* built by startDuel */ }, leave() { if (CD.FX) CD.FX.abort(); if (B) { B.over = true; clearTimeout(B.aiT); } const c = $('#coach'); if (c) c.remove(); } };
 })(globalThis);
 
 /* ===== update.js ===== */
