@@ -1,5 +1,5 @@
 // Offline cache. The cache name carries the app version and is stamped in by build.js.
-const VERSION = 'critter-duel-1.4.0';
+const VERSION = 'critter-duel-1.7.0';
 const FILES = ['./', './index.html', './manifest.webmanifest', './icon-180.png', './icon-192.png', './icon-512.png'];
 self.addEventListener('install', (e) => {
   // cache:'reload' skips the browser's HTTP cache so a new install always stores the newest files
